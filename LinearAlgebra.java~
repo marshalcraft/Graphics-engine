@@ -1,0 +1,1650 @@
+package LinearAlgebraPackage;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.File;
+import javax.imageio.ImageIO;
+import java.util.Scanner;
+import java.lang.Math;
+import java.awt.Dimension;
+import java.awt.*;
+import java.util.List;
+import javax.swing.*;
+import DisplayPackage.Display.*;
+
+public class LinearAlgebra
+{
+  public class Matrix
+  {
+     public int m;
+     public int n;
+     public double Elements[][];
+     public Matrix(int tempm, int tempn)
+    {
+      m = tempm;
+      n = tempn;
+      Elements = new double[m][n];
+    }
+     
+     
+    public Matrix Add(Matrix A, Matrix B)
+    {
+      if(A.n == B.n && A.m == B.m)
+      {
+        LinearAlgebra TempAlgebra = new LinearAlgebra();
+        LinearAlgebra.Matrix TempMatrix = TempAlgebra.new Matrix(A.n, B.m);
+        for(int i = 0; i < A.m; i++)
+        {
+          for(int j = 0; j < B.m; j++)
+          {
+            TempMatrix.Elements[i][j]= A.Elements[i][j]+B.Elements[i][j];
+          }
+        }
+        return TempMatrix;
+      }
+      else
+      {
+        LinearAlgebra TempAlgebra = new LinearAlgebra();
+        LinearAlgebra.Matrix NullMatrix = TempAlgebra.new Matrix(0,0);
+        return NullMatrix;
+      }
+    }
+    
+    public Matrix MatrixProduct(Matrix A, Matrix B)
+    {
+      LinearAlgebra TempAlgebra = new LinearAlgebra();
+      if(A.n == B.m)
+      {
+        LinearAlgebra.Matrix TempMatrix = TempAlgebra.new Matrix(A.m, B.n);
+        for(int i = 0; i < A.m; i++)
+        {
+          for(int j = 0; j < B.n; j++)
+          {
+            double TempElement = 0;
+            for(int k = 0; k < B.m; k++)
+            {
+              TempElement = TempElement + A.Elements[i][k] * B.Elements[k][j];
+            }
+            TempMatrix.Elements[i][j] = TempElement;
+            TempElement = 0;
+          }
+        }
+        return TempMatrix;
+      }
+      else
+      {
+        LinearAlgebra.Matrix NullMatrix = TempAlgebra.new Matrix(0, 0);
+       // System.out.println("CrossProduct failed");
+        return NullMatrix;
+      }
+    }
+    
+    public Matrix MatrixProduct(double Scalar, Matrix B)
+    {
+      for(int i = 0; i < B.m; i++)
+      {
+        for(int j = 0; j < B.n; j++)
+        {
+          B.Elements[i][j] = B.Elements[i][j]*Scalar;
+        }
+      }
+      return B;
+    }
+    
+    public Matrix MatrixInvert(Matrix A)
+    {
+      LinearAlgebra TempAlgebra = new LinearAlgebra();
+      LinearAlgebra.Matrix TempMatrix = TempAlgebra.new Matrix(4,4);
+      
+      double Determinant =
+         A.Elements[0][0]*A.Elements[1][1]*A.Elements[2][2]*A.Elements[3][3]+   A.Elements[0][0]*A.Elements[1][2]*A.Elements[2][3]*A.Elements[3][1]+   A.Elements[0][0]*A.Elements[1][3]*A.Elements[2][1]*A.Elements[3][2]+
+         A.Elements[0][1]*A.Elements[1][0]*A.Elements[2][3]*A.Elements[3][2]+   A.Elements[0][1]*A.Elements[1][2]*A.Elements[2][0]*A.Elements[3][3]+   A.Elements[0][1]*A.Elements[1][3]*A.Elements[2][2]*A.Elements[3][0]+
+         A.Elements[0][2]*A.Elements[1][0]*A.Elements[2][1]*A.Elements[3][3]+   A.Elements[0][2]*A.Elements[1][1]*A.Elements[2][3]*A.Elements[3][0]+   A.Elements[0][2]*A.Elements[1][3]*A.Elements[2][0]*A.Elements[3][1]+
+         A.Elements[0][3]*A.Elements[1][0]*A.Elements[2][2]*A.Elements[3][1]+   A.Elements[0][3]*A.Elements[1][1]*A.Elements[2][0]*A.Elements[3][2]+   A.Elements[0][3]*A.Elements[1][2]*A.Elements[2][1]*A.Elements[3][0]
+        
+        -A.Elements[0][0]*A.Elements[1][1]*A.Elements[2][3]*A.Elements[3][2]   -A.Elements[0][0]*A.Elements[1][2]*A.Elements[2][1]*A.Elements[3][3]   -A.Elements[0][0]*A.Elements[1][3]*A.Elements[2][2]*A.Elements[3][1]
+        -A.Elements[0][1]*A.Elements[1][0]*A.Elements[2][2]*A.Elements[3][3]   -A.Elements[0][1]*A.Elements[1][2]*A.Elements[2][3]*A.Elements[3][0]   -A.Elements[0][1]*A.Elements[1][3]*A.Elements[2][0]*A.Elements[3][2]
+        -A.Elements[0][2]*A.Elements[1][0]*A.Elements[2][3]*A.Elements[3][1]   -A.Elements[0][2]*A.Elements[1][1]*A.Elements[2][0]*A.Elements[3][3]   -A.Elements[0][2]*A.Elements[1][3]*A.Elements[2][1]*A.Elements[3][0]
+        -A.Elements[0][3]*A.Elements[1][0]*A.Elements[2][1]*A.Elements[3][2]   -A.Elements[0][3]*A.Elements[1][1]*A.Elements[2][2]*A.Elements[3][0]   -A.Elements[0][3]*A.Elements[1][2]*A.Elements[2][0]*A.Elements[3][1];
+      
+        double DeterminantInverse = 1d/Determinant;
+      
+        TempMatrix.Elements[0][0]= A.Elements[1][1]*A.Elements[2][2]*A.Elements[3][3]+A.Elements[1][2]*A.Elements[2][3]*A.Elements[3][1]+A.Elements[1][3]*A.Elements[2][1]*A.Elements[3][2]-A.Elements[1][1]*A.Elements[2][3]*A.Elements[3][2]-A.Elements[1][2]*A.Elements[2][1]*A.Elements[3][3]-A.Elements[1][3]*A.Elements[2][2]*A.Elements[3][1];
+        TempMatrix.Elements[0][1]= A.Elements[0][1]*A.Elements[2][3]*A.Elements[3][2]+A.Elements[0][2]*A.Elements[2][1]*A.Elements[3][3]+A.Elements[0][3]*A.Elements[2][2]*A.Elements[3][1]-A.Elements[0][1]*A.Elements[2][2]*A.Elements[3][3]-A.Elements[0][2]*A.Elements[2][3]*A.Elements[3][1]-A.Elements[0][3]*A.Elements[2][1]*A.Elements[3][2];
+        TempMatrix.Elements[0][2]= A.Elements[0][1]*A.Elements[1][2]*A.Elements[3][3]+A.Elements[0][2]*A.Elements[1][3]*A.Elements[3][1]+A.Elements[0][3]*A.Elements[1][1]*A.Elements[3][2]-A.Elements[0][1]*A.Elements[1][3]*A.Elements[3][2]-A.Elements[0][2]*A.Elements[1][1]*A.Elements[3][3]-A.Elements[0][3]*A.Elements[1][2]*A.Elements[3][1];
+        TempMatrix.Elements[0][3]= A.Elements[0][1]*A.Elements[1][3]*A.Elements[2][2]+A.Elements[0][2]*A.Elements[1][1]*A.Elements[2][3]+A.Elements[0][3]*A.Elements[1][2]*A.Elements[2][1]-A.Elements[0][1]*A.Elements[1][2]*A.Elements[2][3]-A.Elements[0][2]*A.Elements[1][3]*A.Elements[2][1]-A.Elements[0][3]*A.Elements[1][1]*A.Elements[2][2];
+        
+        TempMatrix.Elements[1][0]= A.Elements[1][0]*A.Elements[2][3]*A.Elements[3][2]+A.Elements[1][2]*A.Elements[2][0]*A.Elements[3][3]+A.Elements[1][3]*A.Elements[2][2]*A.Elements[3][0]-A.Elements[1][0]*A.Elements[2][2]*A.Elements[3][3]-A.Elements[1][2]*A.Elements[2][3]*A.Elements[3][0]-A.Elements[1][3]*A.Elements[2][0]*A.Elements[3][2];
+        TempMatrix.Elements[1][1]= A.Elements[0][0]*A.Elements[2][2]*A.Elements[3][3]+A.Elements[0][2]*A.Elements[2][3]*A.Elements[3][0]+A.Elements[0][3]*A.Elements[2][0]*A.Elements[3][2]-A.Elements[0][0]*A.Elements[2][3]*A.Elements[3][2]-A.Elements[0][2]*A.Elements[2][0]*A.Elements[3][3]-A.Elements[0][3]*A.Elements[2][2]*A.Elements[3][0];
+        TempMatrix.Elements[1][2]= A.Elements[0][0]*A.Elements[1][3]*A.Elements[3][2]+A.Elements[0][2]*A.Elements[1][0]*A.Elements[3][3]+A.Elements[0][3]*A.Elements[1][2]*A.Elements[3][0]-A.Elements[0][0]*A.Elements[1][2]*A.Elements[3][3]-A.Elements[0][2]*A.Elements[1][3]*A.Elements[3][0]-A.Elements[0][3]*A.Elements[1][0]*A.Elements[3][2];
+        TempMatrix.Elements[1][3]= A.Elements[0][0]*A.Elements[1][2]*A.Elements[2][3]+A.Elements[0][2]*A.Elements[1][3]*A.Elements[2][0]+A.Elements[0][3]*A.Elements[1][0]*A.Elements[2][2]-A.Elements[0][0]*A.Elements[1][3]*A.Elements[2][2]-A.Elements[0][2]*A.Elements[1][0]*A.Elements[2][3]-A.Elements[0][3]*A.Elements[1][2]*A.Elements[2][0];
+        
+        TempMatrix.Elements[2][0]= A.Elements[1][0]*A.Elements[2][1]*A.Elements[3][3]+A.Elements[1][1]*A.Elements[2][3]*A.Elements[3][0]+A.Elements[1][3]*A.Elements[2][0]*A.Elements[3][1]-A.Elements[1][0]*A.Elements[2][3]*A.Elements[3][1]-A.Elements[1][1]*A.Elements[2][0]*A.Elements[3][3]-A.Elements[1][3]*A.Elements[2][1]*A.Elements[3][0];
+        TempMatrix.Elements[2][1]= A.Elements[0][0]*A.Elements[2][3]*A.Elements[3][1]+A.Elements[0][1]*A.Elements[2][0]*A.Elements[3][3]+A.Elements[0][3]*A.Elements[2][1]*A.Elements[3][0]-A.Elements[0][0]*A.Elements[2][1]*A.Elements[3][3]-A.Elements[0][1]*A.Elements[2][3]*A.Elements[3][0]-A.Elements[0][3]*A.Elements[2][0]*A.Elements[3][1];
+        TempMatrix.Elements[2][2]= A.Elements[0][0]*A.Elements[1][1]*A.Elements[3][3]+A.Elements[0][1]*A.Elements[1][3]*A.Elements[3][0]+A.Elements[0][3]*A.Elements[1][0]*A.Elements[3][1]-A.Elements[0][0]*A.Elements[1][3]*A.Elements[3][1]-A.Elements[0][1]*A.Elements[1][0]*A.Elements[3][3]-A.Elements[0][3]*A.Elements[1][1]*A.Elements[3][0];
+        TempMatrix.Elements[2][3]= A.Elements[0][0]*A.Elements[1][3]*A.Elements[2][1]+A.Elements[0][1]*A.Elements[1][0]*A.Elements[2][3]+A.Elements[0][3]*A.Elements[1][1]*A.Elements[2][0]-A.Elements[0][0]*A.Elements[1][1]*A.Elements[2][3]-A.Elements[0][1]*A.Elements[1][3]*A.Elements[2][0]-A.Elements[0][3]*A.Elements[1][0]*A.Elements[2][1];
+        
+        TempMatrix.Elements[3][0]= A.Elements[1][0]*A.Elements[2][2]*A.Elements[3][1]+A.Elements[1][1]*A.Elements[2][0]*A.Elements[3][2]+A.Elements[1][2]*A.Elements[2][1]*A.Elements[3][0]-A.Elements[1][0]*A.Elements[2][1]*A.Elements[3][2]-A.Elements[1][1]*A.Elements[2][2]*A.Elements[3][0]-A.Elements[1][2]*A.Elements[2][0]*A.Elements[3][1];
+        TempMatrix.Elements[3][1]= A.Elements[0][0]*A.Elements[2][1]*A.Elements[3][2]+A.Elements[0][1]*A.Elements[2][2]*A.Elements[3][0]+A.Elements[0][2]*A.Elements[2][0]*A.Elements[3][1]-A.Elements[0][0]*A.Elements[2][2]*A.Elements[3][1]-A.Elements[0][1]*A.Elements[2][0]*A.Elements[3][2]-A.Elements[0][2]*A.Elements[2][1]*A.Elements[3][0];
+        TempMatrix.Elements[3][2]= A.Elements[0][0]*A.Elements[1][2]*A.Elements[3][1]+A.Elements[0][1]*A.Elements[1][0]*A.Elements[3][2]+A.Elements[0][2]*A.Elements[1][1]*A.Elements[3][0]-A.Elements[0][0]*A.Elements[1][1]*A.Elements[3][2]-A.Elements[0][1]*A.Elements[1][2]*A.Elements[3][0]-A.Elements[0][2]*A.Elements[1][0]*A.Elements[3][1];
+        TempMatrix.Elements[3][3]= A.Elements[0][0]*A.Elements[1][1]*A.Elements[2][2]+A.Elements[0][1]*A.Elements[1][2]*A.Elements[2][0]+A.Elements[0][2]*A.Elements[1][0]*A.Elements[2][1]-A.Elements[0][0]*A.Elements[1][2]*A.Elements[2][1]-A.Elements[0][1]*A.Elements[1][0]*A.Elements[2][2]-A.Elements[0][2]*A.Elements[1][0]*A.Elements[2][0];
+        
+        
+      return A.MatrixProduct(DeterminantInverse, TempMatrix);
+    }
+    //**************************************** Computes the inner product (not dot product) *********************
+    //***********************************************************************************************************
+    public double InnerProduct( Matrix A, Matrix B)
+    {
+      double innerProduct = 0;
+      if(A.m == B.n && A.n == B.m)
+      {
+        for(int x = 0; x < A.m; x++)
+        {
+          innerProduct += A.Elements[x][0]*B.Elements[0][x];
+        }
+      }
+      //System.out.println("Inner Product is "+innerProduct);
+      return innerProduct;
+    }
+    public void CrudeMatrixCreator(Matrix A)
+    {
+      for(int i = 0; i < A.m; i++)
+      {
+        System.out.println("Enter "+A.n+"rows now");
+        for(int j = 0; j < A.n; j++)
+        {
+          Scanner sc = new Scanner(System.in);
+          A.Elements[i][j] = sc.nextDouble();
+        }
+      }
+    }
+    
+    public void CrudeMatrixPrint(Matrix A)
+    {
+      for(int i = 0; i < A.m; i++)
+      {
+        for(int j = 0; j < A.n; j++)
+        {
+          System.out.print(A.Elements[i][j] +"    ");
+        }
+        System.out.println();
+      }
+    }
+  
+    
+    public class Rotation
+    {
+      double Alpha;
+      double Beta;
+      double Gamma;
+      
+      LinearAlgebra RotationAlgebra = new LinearAlgebra();
+      LinearAlgebra.Matrix RotateAboutX = RotationAlgebra.new Matrix(4,4);
+      LinearAlgebra.Matrix RotateAboutY = RotationAlgebra.new Matrix(4,4);
+      LinearAlgebra.Matrix RotateAboutZ = RotationAlgebra.new Matrix(4,4);
+      LinearAlgebra.Matrix RotateAboutThreeAxis = RotationAlgebra.new Matrix(4,4);
+      
+      public void RotationOneAxis( double EulerA, int RotDimension)
+      {
+        if(RotDimension == 0)
+        {
+          RotateAboutX.Elements[0][0] = 1d;
+          RotateAboutX.Elements[1][1] = Math.cos(EulerA);
+          RotateAboutX.Elements[1][2] = -Math.sin(EulerA);
+          RotateAboutX.Elements[2][1] = Math.sin(EulerA);
+          RotateAboutX.Elements[2][2] = Math.cos(EulerA);
+          RotateAboutX.Elements[3][3] = 1d;
+      }
+      if(RotDimension == 1)
+      {
+        RotateAboutY.Elements[0][0] = Math.cos(EulerA);
+        RotateAboutY.Elements[0][2] = Math.sin(EulerA);
+        RotateAboutY.Elements[1][1] = 1d;
+        RotateAboutY.Elements[2][0] = -Math.sin(EulerA);
+        RotateAboutY.Elements[2][2] = Math.cos(EulerA);
+        RotateAboutY.Elements[3][3] = 1d;
+      }
+      else
+      {
+        RotateAboutZ.Elements[0][0] = Math.cos(EulerA);
+        RotateAboutZ.Elements[0][1] = -Math.sin(EulerA);
+        RotateAboutZ.Elements[1][0] = Math.sin(EulerA);
+        RotateAboutZ.Elements[1][1] = Math.cos(EulerA);
+        RotateAboutZ.Elements[2][2] = 1d;
+        RotateAboutZ.Elements[3][3] = 1d;
+      }
+      }
+      public void RotationThreeAxis( double AlphaTemp,double BetaTemp, double GammaTemp)
+      {
+        Alpha = AlphaTemp;
+        Beta = BetaTemp;
+        Gamma = GammaTemp;
+        RotationOneAxis( Gamma,0);
+        RotationOneAxis( Beta,1);
+        RotationOneAxis( Alpha, 2);
+        RotateAboutThreeAxis = MatrixProduct( RotateAboutZ,   MatrixProduct(RotateAboutY, RotateAboutX));
+      }
+    }
+    
+    public class RotationChangeOfBasis
+    {
+      
+    }
+    
+    public class Translate
+    {
+      double X;
+      double Y;
+      double Z;
+      
+      LinearAlgebra TranslationAlgebra = new LinearAlgebra();
+      LinearAlgebra.Matrix TranslationMatrix = TranslationAlgebra.new Matrix(4,4);
+      
+      public Translate(double XShift, double YShift, double ZShift)
+      {
+        X = XShift;
+        Y = YShift;
+        Z = ZShift;
+        
+        TranslationMatrix.Elements[0][0] = 1d;
+        TranslationMatrix.Elements[1][1] = 1d;
+        TranslationMatrix.Elements[2][2] = 1d;
+        TranslationMatrix.Elements[3][3] = 1d;
+        TranslationMatrix.Elements[0][3] = X;
+        TranslationMatrix.Elements[1][3] = Y;
+        TranslationMatrix.Elements[2][3] = Z;
+      }
+    }
+    
+    // Points are array of 4 by 1's with connections to other 4 by 1 inside pointarray.
+    public class Points
+    {
+      public int PointsLength;
+      LinearAlgebra PointsAlgebra = new LinearAlgebra();
+      public LinearAlgebra.Matrix[] PointsArray;
+      LinearAlgebra.Matrix[] Connections;
+      
+      public Points()
+      {
+        PointsArray = new Matrix[0];
+        PointsArray[0] = PointsAlgebra.new Matrix(0,0);
+        PointsLength = 0;
+      }
+      public Points(int NumPoints)
+      {
+        PointsArray = new Matrix[NumPoints];
+        PointsLength = NumPoints;
+        for(int i = 0; i < NumPoints; i++)
+        {
+          PointsArray[i] = PointsAlgebra.new Matrix(4,1);
+        }
+      }
+      public void CrudePointAdder()
+      {
+        System.out.println("Enter points now");
+        for(int i = 0; i < PointsLength; i ++)
+        {
+          System.out.println("New point");
+          for(int j = 0; j < 4; j++)
+          {
+            for(int k = 0; k < 1; k++)
+            {
+              if( j == 3)
+              {
+                PointsArray[i].Elements[j][k] = 1d;
+              }
+              else
+              {
+                 Scanner sc = new Scanner(System.in);
+                 PointsArray[i].Elements[j][k] = sc.nextDouble();
+              }
+            }
+          }
+        }
+      }
+      
+      public void InitializeConnections()
+      {
+        Connections = new Matrix[PointsLength];
+       // System.out.println(PointsLength);
+        for(int i = 0; i < PointsLength; i++)
+        {
+          Connections[i] = PointsAlgebra.new Matrix(PointsLength,1);
+        // System.out.println(i+", " + PointsLength);
+        }
+      }
+      
+      public void CrudeConnector()
+      {
+        boolean ContinueConnection = true;
+        boolean ContinuePoint = true;
+        int i = -1;
+        int j = 0;
+        System.out.println("Enter a point or -1 to quit");
+        while(ContinuePoint == true)
+        {
+          Scanner sc = new Scanner(System.in);
+          i = sc.nextInt();
+          if(i < PointsLength && i >= 0)
+          {
+            Scanner scTwo = new Scanner(System.in);
+            System.out.println("Enter connected point");
+            j = sc.nextInt();
+            if(j < PointsLength && j >= 0)
+            {
+              Connections[i].Elements[j][0] = 1; 
+            }
+          }
+          else
+          {
+            ContinuePoint = false; // try = -1 
+          }
+        }
+      }
+      
+    } 
+      
+    
+  }
+  public void Projection(double ZOffSet, Matrix ThreeDimensionalCoordinate, Matrix TwoDimProjectionMatrix)
+    {
+      double ZCoordinate = ThreeDimensionalCoordinate.Elements[2][0];
+      for(int i = 0; i < 3; i ++)
+      {
+        if(ZCoordinate != 0)//have to decide how to handle attempts to project things that are behind the camera
+        {
+          TwoDimProjectionMatrix.Elements[i][0] = (ZOffSet/ZCoordinate)*ThreeDimensionalCoordinate.Elements[i][0];
+        }
+      }
+    }
+      
+      //Extends Projection to Point Array
+    public void Projection(Matrix.Points ThreeDimPointArray , Matrix.Points TwoDimPointArray, double ZOffSet)
+    {
+        for(int i = 0; i < ThreeDimPointArray.PointsLength; i++)
+        {
+          Projection(ZOffSet, ThreeDimPointArray.PointsArray[i], TwoDimPointArray.PointsArray[i]);
+        }
+    }
+    
+    public Matrix CompositionRotateThenTranslate(Matrix Vector, double Alpha, double Beta, double Gamma, double TransX,
+    double TransY, double TransZ)
+    {
+      LinearAlgebra.Matrix.Rotation TestRotate = Vector.new Rotation(); // These should be initialized ...
+      LinearAlgebra.Matrix.Translate TestTranslate = Vector.new Translate(TransX, TransY, TransZ); // ... similarly.
+      TestRotate.RotationThreeAxis(Alpha, Beta, Gamma); // So this should be done when initialized.
+      
+      //TestRotate.RotateAboutThreeAxis.CrudeMatrixPrint(TestRotate.RotateAboutThreeAxis.MatrixProduct( TestTranslate.TranslationMatrix,TestRotate.RotateAboutThreeAxis));
+      
+      return Vector.MatrixProduct(Vector.MatrixProduct( TestTranslate.TranslationMatrix.MatrixInvert(TestTranslate.TranslationMatrix), 
+      TestRotate.RotateAboutThreeAxis.MatrixInvert(TestRotate.RotateAboutThreeAxis)),Vector);
+    }
+    
+    public Matrix.Points CompositionRotateThenTranslate(Matrix.Points CollectionOfPoints, double Alpha, double Beta, 
+    double Gamma, double TransX, double TransY, double TransZ)
+    {
+      Matrix wtf = new Matrix(1,1);
+      Matrix.Points temp = wtf.new Points(CollectionOfPoints.PointsLength);
+      for(int i = 0; i < CollectionOfPoints.PointsLength; i++)
+      {
+        temp.PointsArray[i] = CompositionRotateThenTranslate( 
+        CollectionOfPoints.PointsArray[i], Alpha, Beta, Gamma, TransX, TransY, TransZ);
+      }
+      return temp;
+    }
+    
+    public BufferedImage DrawProjectionPoints(BufferedImage img, Matrix.Points TwoDimPoints)
+    {
+      for(int i = 0; i < TwoDimPoints.PointsLength; i++)
+      {
+        int x = (int)TwoDimPoints.PointsArray[i].Elements[0][0];
+        int y = (int)TwoDimPoints.PointsArray[i].Elements[1][0];
+        
+        double X = TwoDimPoints.PointsArray[i].Elements[0][0];
+        double Y = TwoDimPoints.PointsArray[i].Elements[1][0];
+        
+        //System.out.println("("+x+","+y+")");
+       // System.out.println("("+X+","+Y+/**","+TwoDimPoints.PointsArray[i].Elements[2][0]+**/")");
+        
+        if(x < 680 && y < 384 && x >= -679 && y >= -383)
+        {
+            int p;
+            int A;
+            int R;
+            int G;
+            int B;
+            
+          
+              A = 255;
+              R = 0;
+              G = 0;
+              B = 0;
+            
+            
+            
+            p = (A<<24) | (B<<16) | (G<<8) | R;
+            img.setRGB(x+680, y+384, p);
+       }
+      }
+      return img;
+    }
+    public double ComputeDistancFromPointToLineDefinedByTwoPoints(double PX0, double PY0, double PX1, double PY1, double PX2,double PY2)
+    {
+      return (Math.abs((PY2-PY1)*PX0-(PX2-PX1)*PY0+PX2*PY1-PY2*PX1)/(Math.sqrt(Math.pow(PY2-PY1,2d)+Math.pow(PX2-PX1, 2d))));
+    }
+   /** public BufferedImage DrawProjectionConnections(BufferedImage img, Matrix.Points TwoDimPoints)
+    {
+      
+      //revise, calculate slope, then start point move over x and y components to get new
+      for(int i = 0; i < TwoDimPoints.PointsLength; i++)
+      {
+        for(int j = 0; j < TwoDimPoints.PointsLength; j++)
+        {
+          if(TwoDimPoints.Connections[i].Elements[j][0] == 1)
+          {
+            double x, y, xTwo, yTwo, LineThinkness;
+            int X, Y;
+            
+            x = TwoDimPoints.PointsArray[i].Elements[0][0];
+            y = TwoDimPoints.PointsArray[i].Elements[1][0];
+            xTwo = TwoDimPoints.PointsArray[j].Elements[0][0];
+            yTwo = TwoDimPoints.PointsArray[j].Elements[1][0];
+            double temp;
+            
+            LineThinkness = 1d;
+            for(double k = -400; k < 399; k++)
+            {
+              for(double l = -400; l < 399; l++)
+              {
+                temp = ComputeDistancFromPointToLineDefinedByTwoPoints(k, l, x, y, xTwo, yTwo);
+                double XMin = Math.min(x, xTwo);
+                double XMax = Math.max(x, xTwo);
+                double YMin = Math.min(y, yTwo);
+                double YMax = Math.max(y, yTwo);
+                if( LineThinkness > temp) //&& l >= (((yTwo-y)/(xTwo-x))*(k-x)+y)) //== (int)((yTwo-y)/(xTwo-x))*(k-x)+y+1 ) //put divide by zero catch if point connected to itself.
+                {
+                  if(k >= XMin && k <= XMax && l >= YMin && l <= YMax  )
+                  {
+                    int p;
+                    int A;
+                    int R;
+                    int G;
+                    int B;
+            
+          
+                    A = (int)(255*(1-(temp)));
+                    R = 0;
+                    G = 0;
+                    B = 0;
+                  
+            
+            
+                   p = (A<<24) | (B<<16) | (G<<8) | R;
+                   img.setRGB((int)k+400, (int)l+400, p);
+                  }
+                }
+                if( Math.abs(x-xTwo)<1 && Math.abs(k-x)<1)
+                  {
+                    if(k >= XMin && k <= XMax && l >= YMin && l <= YMax  )
+                    {
+                      int p;
+                      int A;
+                      int R;
+                      int G;
+                      int B;
+            
+          
+                      A = (int)(255*(1-Math.abs(k-x)));
+                      R = 0;
+                      G = 0;
+                      B = 0;
+                  
+            
+            
+                     p = (A<<24) | (B<<16) | (G<<8) | R;
+                     img.setRGB((int)k+400, (int)l+400, p);
+                    }
+                  
+                }
+                if( Math.abs(y-yTwo)<1 && Math.abs(l-y)<1)
+                  {
+                    if(k >= XMin && k <= XMax && l >= YMin && l <= YMax )
+                    {
+                      int p;
+                      int A;
+                      int R;
+                      int G;
+                      int B;
+            
+          
+                      A = (int)(255*(1-Math.abs(l-y)));
+                      R = 0;
+                      G = 0;
+                      B = 0;
+                  
+            
+            
+                     p = (A<<24) | (B<<16) | (G<<8) | R;
+                     img.setRGB((int)k+400, (int)l+400, p);
+                    }
+                  
+                }
+                
+              }
+            }
+          }
+        }
+      }
+      for(int x = 0; x < 800; x++)
+      {
+        for(int y = 0; y < 800; y++)
+        {
+          int p = img.getRGB(x,y);
+          if(p == 0)
+          {
+            int A;
+            int R;
+            int G;
+            int B;
+            
+          
+            A = 255;
+            R = 255;
+            G = 255;
+            B = 255;
+            
+            p = (A<<24) | (B<<16) | (G<<8) | R;
+            img.setRGB(x, y, p);
+          }
+         
+          if(p != 0);
+          {
+            /**int A;
+            int R;
+            int G;
+            int B;
+            
+          
+            A = 255;
+            R = 255;
+            G = 255;
+            B = 255;
+            
+            p = (A<<24) | (B<<16) | (G<<8) | R;
+            img.setRGB(x, y, p);
+          }
+          
+        }
+      }
+      return img;
+    }**/
+    public BufferedImage DrawProjectionConnectionsReducedOverHead(BufferedImage img, Matrix.Points TwoDimPoints, List<List<Integer>> Connections,
+    double ResolutionX, double ResolutionY, int EnumerationStartingValue)
+    {
+      int debug = Connections.size();
+      System.out.println(debug);
+      double LineThinkness = .05;//5e-100;
+      double x, y, xTwo, yTwo;
+      boolean xInViewingPlane, yInViewingPlane, xTwoInViewingPlane, yTwoInViewingPlane, AllInViewingPlane;
+      double XMin;
+      double XMax;
+      double YMin;
+      double YMax;
+      double temp;
+      double Slope;
+      double dx;
+      double dy;
+      double Dx;
+      double Dy;
+      double DX;
+      double DY;
+      double b;
+      int X, Y;
+      
+      int p;
+      int A;
+      int R;
+      int G;
+      int B;
+      
+      //****** temporary should compute increment from resolution ********
+      //DX = .5;
+      for(int i = 0; i < ResolutionX; i++)
+      {
+        for(int j = 0; j < ResolutionY; j++)
+        {
+          p = img.getRGB( i, j);
+          if(p == 0)
+          {
+            A = 255;
+            R = 84;
+            G = 74;
+            B = 74;
+            
+            p = (A<<24) | (B<<16) | (G<<8) | R;
+            img.setRGB(i, j, p);
+          }
+        }
+      }
+      for(int i = 0; i < debug; i++)
+      {
+        for(int j = 0; j < Connections.get(i).size()-1; j++)
+        {
+            x = TwoDimPoints.PointsArray[Connections.get(i).get(j)-EnumerationStartingValue].Elements[0][0];
+            y = TwoDimPoints.PointsArray[Connections.get(i).get(j)-EnumerationStartingValue].Elements[1][0];
+            xTwo = TwoDimPoints.PointsArray[Connections.get(i).get(j+1)-EnumerationStartingValue].Elements[0][0];
+            yTwo = TwoDimPoints.PointsArray[Connections.get(i).get(j+1)-EnumerationStartingValue].Elements[1][0];
+            //System.out.println("i value is "+i+" out of "+debug+", j value is "+j);
+            XMin = Math.min(x, xTwo);
+            XMax = Math.max(x, xTwo);
+            YMin = Math.min(y, yTwo);
+            YMax = Math.max(y, yTwo);
+            
+            xInViewingPlane = false;
+            yInViewingPlane = false;
+            xTwoInViewingPlane = false;
+            yTwoInViewingPlane = false;
+            AllInViewingPlane = true;
+            
+            dx = xTwo-x;
+            dy = yTwo-y;
+            Slope = dy/dx;
+            b = y-x*Slope;
+            DX = Math.min(Math.abs(.05*Math.pow(Slope, -1.0)),.5);
+            //********************* Are any of the points outside the viewing plane *******************
+            if(x > -ResolutionX/2.0 || x < ResolutionX/2.0)
+            {
+              xInViewingPlane = true;
+            }
+            if(xTwo > -ResolutionX/2.0 || x < ResolutionX/2.0)
+            {
+              xTwoInViewingPlane = true;
+            }
+            if(y > -ResolutionY/2.0 || y < ResolutionY/2.0)
+            {
+              yInViewingPlane = true;
+            }
+            if(yTwo > -ResolutionY/2.0 || yTwo < ResolutionY/2.0)
+            {
+              yTwoInViewingPlane = true;
+            }
+            if(xInViewingPlane == false || yInViewingPlane == false || xTwoInViewingPlane == false || yTwoInViewingPlane == false)
+            {
+              AllInViewingPlane = false;
+              System.out.println("Should not make it here for now until handle points outside of viewing plane.");
+            }
+            //************************** Case 1: All points are in viewing plane *******************************
+            if(AllInViewingPlane == true)
+            {
+              for(Dx = XMin; Dx < XMax; Dx +=DX)
+              {
+                Dy = Slope*Dx+b;
+                //Dy = Dy+Slope*DX;
+                temp = ((int)(Math.abs(Dx)+Math.abs(Dy)))/(Math.abs(Dx)+Math.abs(Dy));
+                A = (int)(255*temp);
+                R = 60;
+                G = 182;
+                B = 255;
+                  
+                p = (A<<24) | (B<<16) | (G<<8) | R;
+                if(((int)(Dy+ResolutionY/2.0) >= 0 && (int)(Dx+ResolutionX/2.0) >= 0
+                && (int)(Dy+ResolutionY/2.0) < ResolutionY && (int)(Dx+ResolutionX/2.0) < ResolutionX) )//&& Dy > YMin && Dy < YMax )
+                {
+                  img.setRGB((int)(Dx+ResolutionX/2.0), (int)(Dy+ResolutionY/2.0), p);
+                }
+              }
+            }
+            //************************* Case 2: Points outside viewing plane **********************************
+            
+        }
+        x = TwoDimPoints.PointsArray[Connections.get(i).get(Connections.get(i).size()-1)-EnumerationStartingValue].Elements[0][0];
+        y = TwoDimPoints.PointsArray[Connections.get(i).get(Connections.get(i).size()-1)-EnumerationStartingValue].Elements[1][0];
+        xTwo = TwoDimPoints.PointsArray[Connections.get(i).get(0)-EnumerationStartingValue].Elements[0][0];
+        yTwo = TwoDimPoints.PointsArray[Connections.get(i).get(0)-EnumerationStartingValue].Elements[1][0];
+        //System.out.println("i value is "+i+" out of "+debug);
+        XMin = Math.min(x, xTwo);
+        XMax = Math.max(x, xTwo);
+        YMin = Math.min(y, yTwo);
+        YMax = Math.max(y, yTwo);
+          
+        xInViewingPlane = false;
+        yInViewingPlane = false;
+        xTwoInViewingPlane = false;
+        yTwoInViewingPlane = false;
+        AllInViewingPlane = true;
+            
+        dx = xTwo-x;
+        dy = yTwo-y;
+        Slope = dy/dx;
+        b = y-x*Slope;
+        DX = Math.min(Math.abs(.05*Math.pow(Slope, -1.0)),.5);
+        //********************* Are any of the points outside the viewing plane *******************
+        if(x > -ResolutionX/2.0 || x < ResolutionX/2.0)
+        {
+          xInViewingPlane = true;
+        }
+        if(xTwo > -ResolutionX/2.0 || x < ResolutionX/2.0)
+        {
+          xTwoInViewingPlane = true;
+        }
+        if(y > -ResolutionY/2.0 || y < ResolutionY/2.0)
+        {
+          yInViewingPlane = true;
+        }
+        if(yTwo > -ResolutionY/2.0 || yTwo < ResolutionY/2.0)
+        {
+          yTwoInViewingPlane = true;
+        }
+        if(xInViewingPlane == false || yInViewingPlane == false || xTwoInViewingPlane == false || yTwoInViewingPlane == false)
+        {
+          AllInViewingPlane = false;
+          System.out.println("Should not make it here for now until handle points outside of viewing plane.");
+        }
+        //************************** Case 1: All points are in viewing plane *******************************
+        if(AllInViewingPlane == true)
+        {
+          for(Dx = XMin; Dx < XMax; Dx +=DX)
+          {
+            Dy = Slope*Dx+b;
+           // Dy = Dy+Slope*DX;
+            temp = ((int)(Math.abs(Dx)+Math.abs(Dy)))/(Math.abs(Dx)+Math.abs(Dy));
+            A = (int)(255*temp);
+            R = 60;
+            G = 182;
+            B = 255;
+               
+            p = (A<<24) | (B<<16) | (G<<8) | R;
+            if(((int)(Dy+ResolutionY/2.0) > 0 && (int)(Dx+ResolutionX/2.0) > 0
+            && (int)(Dy+ResolutionY/2.0) < ResolutionY && (int)(Dx+ResolutionX/2.0) < ResolutionX) )//&& Dy > YMin && Dy < YMax )
+            {
+              img.setRGB((int)(Dx+ResolutionX/2.0), (int)(Dy+ResolutionY/2.0), p);
+            }
+           }
+        }
+        //************************* Case 2: Points outside viewing plane **********************************
+      }
+      return img;
+    }
+    
+    public BufferedImage DrawProjectionConnectionsReducedOverHeadOpaque(BufferedImage img, Matrix.Points TwoDimPoints, List<List<Integer>> Connections,
+    double ResolutionX, double ResolutionY, int EnumerationStartingValue)
+    {
+      int debug = Connections.size();
+      System.out.println(debug);
+      double LineThinkness = .05;//5e-100;
+      double x, y, xTwo, yTwo;
+      boolean xInViewingPlane, yInViewingPlane, xTwoInViewingPlane, yTwoInViewingPlane, AllInViewingPlane;
+      double XMin;
+      double XMax;
+      double YMin;
+      double YMax;
+      double temp;
+      double Slope;
+      double dx;
+      double dy;
+      double Dx;
+      double Dy;
+      double DX;
+      double DY;
+      double b;
+      int X, Y;
+      
+      int p;
+      int A;
+      int R;
+      int G;
+      int B;
+      
+      //****** temporary should compute increment from resolution ********
+      //DX = .5;
+      for(int i = 0; i < ResolutionX; i++)
+      {
+        for(int j = 0; j < ResolutionY; j++)
+        {
+          p = img.getRGB( i, j);
+          if(p == 0)
+          {
+            A = 255;
+            R = 84;
+            G = 74;
+            B = 74;
+            
+            p = (A<<24) | (B<<16) | (G<<8) | R;
+            img.setRGB(i, j, p);
+          }
+        }
+      }
+      for(int i = 0; i < debug; i++)
+      {
+        for(int j = 0; j < Connections.get(i).size()-1; j++)
+        {
+            x = TwoDimPoints.PointsArray[Connections.get(i).get(j)-EnumerationStartingValue].Elements[0][0];
+            y = TwoDimPoints.PointsArray[Connections.get(i).get(j)-EnumerationStartingValue].Elements[1][0];
+            xTwo = TwoDimPoints.PointsArray[Connections.get(i).get(j+1)-EnumerationStartingValue].Elements[0][0];
+            yTwo = TwoDimPoints.PointsArray[Connections.get(i).get(j+1)-EnumerationStartingValue].Elements[1][0];
+            //System.out.println("i value is "+i+" out of "+debug+", j value is "+j);
+            XMin = Math.min(x, xTwo);
+            XMax = Math.max(x, xTwo);
+            YMin = Math.min(y, yTwo);
+            YMax = Math.max(y, yTwo);
+            
+            xInViewingPlane = false;
+            yInViewingPlane = false;
+            xTwoInViewingPlane = false;
+            yTwoInViewingPlane = false;
+            AllInViewingPlane = true;
+            
+            dx = xTwo-x;
+            dy = yTwo-y;
+            Slope = dy/dx;
+            b = y-x*Slope;
+            DX = Math.min(Math.abs(.05*Math.pow(Slope, -1.0)),.5);
+            //********************* Are any of the points outside the viewing plane *******************
+            if(x > -ResolutionX/2.0 || x < ResolutionX/2.0)
+            {
+              xInViewingPlane = true;
+            }
+            if(xTwo > -ResolutionX/2.0 || x < ResolutionX/2.0)
+            {
+              xTwoInViewingPlane = true;
+            }
+            if(y > -ResolutionY/2.0 || y < ResolutionY/2.0)
+            {
+              yInViewingPlane = true;
+            }
+            if(yTwo > -ResolutionY/2.0 || yTwo < ResolutionY/2.0)
+            {
+              yTwoInViewingPlane = true;
+            }
+            if(xInViewingPlane == false || yInViewingPlane == false || xTwoInViewingPlane == false || yTwoInViewingPlane == false)
+            {
+              AllInViewingPlane = false;
+              System.out.println("Should not make it here for now until handle points outside of viewing plane.");
+            }
+            //************************** Case 1: All points are in viewing plane *******************************
+            if(AllInViewingPlane == true)
+            {
+              for(Dx = XMin; Dx < XMax; Dx +=DX)
+              {
+                Dy = Slope*Dx+b;
+                //Dy = Dy+Slope*DX;
+                temp = ((int)(Math.abs(Dx)+Math.abs(Dy)))/(Math.abs(Dx)+Math.abs(Dy));
+                A = (int)(255*temp);
+                R = 60;
+                G = 182;
+                B = 255;
+                  
+                p = (A<<24) | (B<<16) | (G<<8) | R;
+                if(((int)(Dy+ResolutionY/2.0) >= 0 && (int)(Dx+ResolutionX/2.0) >= 0
+                && (int)(Dy+ResolutionY/2.0) < ResolutionY && (int)(Dx+ResolutionX/2.0) < ResolutionX) )//&& Dy > YMin && Dy < YMax )
+                {
+                  img.setRGB((int)(Dx+ResolutionX/2.0), (int)(Dy+ResolutionY/2.0), p);
+                }
+              }
+            }
+            //************************* Case 2: Points outside viewing plane **********************************
+            
+        }
+        x = TwoDimPoints.PointsArray[Connections.get(i).get(Connections.get(i).size()-1)-EnumerationStartingValue].Elements[0][0];
+        y = TwoDimPoints.PointsArray[Connections.get(i).get(Connections.get(i).size()-1)-EnumerationStartingValue].Elements[1][0];
+        xTwo = TwoDimPoints.PointsArray[Connections.get(i).get(0)-EnumerationStartingValue].Elements[0][0];
+        yTwo = TwoDimPoints.PointsArray[Connections.get(i).get(0)-EnumerationStartingValue].Elements[1][0];
+        //System.out.println("i value is "+i+" out of "+debug);
+        XMin = Math.min(x, xTwo);
+        XMax = Math.max(x, xTwo);
+        YMin = Math.min(y, yTwo);
+        YMax = Math.max(y, yTwo);
+          
+        xInViewingPlane = false;
+        yInViewingPlane = false;
+        xTwoInViewingPlane = false;
+        yTwoInViewingPlane = false;
+        AllInViewingPlane = true;
+            
+        dx = xTwo-x;
+        dy = yTwo-y;
+        Slope = dy/dx;
+        b = y-x*Slope;
+        DX = Math.min(Math.abs(.05*Math.pow(Slope, -1.0)),.5);
+        //********************* Are any of the points outside the viewing plane *******************
+        if(x > -ResolutionX/2.0 || x < ResolutionX/2.0)
+        {
+          xInViewingPlane = true;
+        }
+        if(xTwo > -ResolutionX/2.0 || x < ResolutionX/2.0)
+        {
+          xTwoInViewingPlane = true;
+        }
+        if(y > -ResolutionY/2.0 || y < ResolutionY/2.0)
+        {
+          yInViewingPlane = true;
+        }
+        if(yTwo > -ResolutionY/2.0 || yTwo < ResolutionY/2.0)
+        {
+          yTwoInViewingPlane = true;
+        }
+        if(xInViewingPlane == false || yInViewingPlane == false || xTwoInViewingPlane == false || yTwoInViewingPlane == false)
+        {
+          AllInViewingPlane = false;
+          System.out.println("Should not make it here for now until handle points outside of viewing plane.");
+        }
+        //************************** Case 1: All points are in viewing plane *******************************
+        if(AllInViewingPlane == true)
+        {
+          for(Dx = XMin; Dx < XMax; Dx +=DX)
+          {
+            Dy = Slope*Dx+b;
+           // Dy = Dy+Slope*DX;
+            temp = ((int)(Math.abs(Dx)+Math.abs(Dy)))/(Math.abs(Dx)+Math.abs(Dy));
+            A = (int)(255*temp);
+            R = 60;
+            G = 182;
+            B = 255;
+               
+            p = (A<<24) | (B<<16) | (G<<8) | R;
+            if(((int)(Dy+ResolutionY/2.0) > 0 && (int)(Dx+ResolutionX/2.0) > 0
+            && (int)(Dy+ResolutionY/2.0) < ResolutionY && (int)(Dx+ResolutionX/2.0) < ResolutionX) )//&& Dy > YMin && Dy < YMax )
+            {
+              img.setRGB((int)(Dx+ResolutionX/2.0), (int)(Dy+ResolutionY/2.0), p);
+            }
+           }
+        }
+        //************************* Case 2: Points outside viewing plane **********************************
+      }
+      return img;
+    }
+    
+     public BufferedImage DrawProjectionConnectionsReducedOverHead(BufferedImage img, Matrix.Points TwoDimPoints, List<List<Integer>> Connections,
+    List<Integer> CrulledBackGroundList, double ResolutionX, double ResolutionY, int EnumerationStartingPoint)
+    {
+      int debugWillUseThisInstead = CrulledBackGroundList.size();
+      //System.out.println(CrulledBackGroundList.size()+", "+Connections.size());
+      int debug = Connections.size();
+      double LineThinkness = .05;//5e-100;
+      double x, y, xTwo, yTwo;
+      boolean xInViewingPlane, yInViewingPlane, xTwoInViewingPlane, yTwoInViewingPlane, AllInViewingPlane;
+      double XMin;
+      double XMax;
+      double YMin;
+      double YMax;
+      double temp;
+      double Slope;
+      double dx;
+      double dy;
+      double Dx;
+      double Dy;
+      double DX;
+      double DY;
+      double b;
+      int X, Y;
+      
+      //EnumerationStartingPoint = -1; // debug..
+      
+      int p;
+      int A;
+      int R;
+      int G;
+      int B;
+      
+      //****** temporary should compute increment from resolution ********
+      //DX = .05;
+      for(int i = 0; i < ResolutionX; i++)
+      {
+        for(int j = 0; j < ResolutionY; j++)
+        {
+          p = img.getRGB( i, j);
+          if(p == 0)
+          {
+            A = 255;
+            R = 84;
+            G = 74;
+            B = 74;
+            
+            p = (A<<24) | (B<<16) | (G<<8) | R;
+            img.setRGB(i, j, p);
+          }
+        }
+      }
+      //System.out.println(TwoDimPoints.PointsArray.length);
+      //System.out.println(debugWillUseThisInstead);
+      for(int i = 0; i < debugWillUseThisInstead; i++)
+      {
+        int CameraFacingPolygons = CrulledBackGroundList.get(i);
+        for(int j = 0; j < Connections.get(CameraFacingPolygons).size()-1; j++)// I beleive this -1 is because the last line wraps back to the first
+        {                                                                      // and so the last connection must be drawn differently.
+            x = TwoDimPoints.PointsArray[Connections.get(CameraFacingPolygons).get(j)-EnumerationStartingPoint].Elements[0][0];//These Enumeration amounts are due to
+            y = TwoDimPoints.PointsArray[Connections.get(CameraFacingPolygons).get(j)-EnumerationStartingPoint].Elements[1][0];//the .obj which starts point enumeration
+            xTwo = TwoDimPoints.PointsArray[Connections.get(CameraFacingPolygons).get(j+1)-EnumerationStartingPoint].Elements[0][0];//at 1 instead of zero.
+            yTwo = TwoDimPoints.PointsArray[Connections.get(CameraFacingPolygons).get(j+1)-EnumerationStartingPoint].Elements[1][0];
+            //System.out.println("i value is "+i+" out of "+debug+", j value is "+j);
+            XMin = Math.min(x, xTwo);
+            XMax = Math.max(x, xTwo);
+            YMin = Math.min(y, yTwo);
+            YMax = Math.max(y, yTwo);
+            
+            xInViewingPlane = false;
+            yInViewingPlane = false;
+            xTwoInViewingPlane = false;
+            yTwoInViewingPlane = false;
+            AllInViewingPlane = true;
+            
+            dx = xTwo-x;
+            dy = yTwo-y;
+            Slope = dy/dx;
+            b = y-x*Slope;
+            DX = Math.min(Math.abs(.05*Math.pow(Slope, -1.0)),.5);
+            //********************* Are any of the points outside the viewing plane *******************
+            if(x > -ResolutionX/2.0 || x < ResolutionX/2.0)
+            {
+              xInViewingPlane = true;
+            }
+            if(xTwo > -ResolutionX/2.0 || x < ResolutionX/2.0)
+            {
+              xTwoInViewingPlane = true;
+            }
+            if(y > -ResolutionY/2.0 || y < ResolutionY/2.0)
+            {
+              yInViewingPlane = true;
+            }
+            if(yTwo > -ResolutionY/2.0 || yTwo < ResolutionY/2.0)
+            {
+              yTwoInViewingPlane = true;
+            }
+            if(xInViewingPlane == false || yInViewingPlane == false || xTwoInViewingPlane == false || yTwoInViewingPlane == false)
+            {
+              AllInViewingPlane = false;
+              //System.out.println("Should not make it here for now until handle points outside of viewing plane.");
+            }
+            //************************** Case 1: All points are in viewing plane *******************************
+            if(AllInViewingPlane == true)
+            {
+              for(Dx = XMin; Dx < XMax; Dx +=DX)
+              {
+                Dy = Slope*Dx+b;
+                //Dy = Dy+Slope*DX;
+                temp = ((int)(Math.abs(Dx)+Math.abs(Dy)))/(Math.abs(Dx)+Math.abs(Dy));
+                A = (int)(255*temp);
+                R = 60;
+                G = 182;
+                B = 255;
+                  
+                p = (A<<24) | (B<<16) | (G<<8) | R;
+                if(((int)(Dy+ResolutionY/2.0) > 0 && (int)(Dx+ResolutionX/2.0) > 0
+                && (int)(Dy+ResolutionY/2.0) < ResolutionY && (int)(Dx+ResolutionX/2.0) < ResolutionX))// && Dy > YMin && Dy < YMax )
+                {
+                  img.setRGB((int)(Dx+ResolutionX/2.0), (int)(Dy+ResolutionY/2.0), p);
+                }
+              }
+            }
+            //************************* Case 2: Points outside viewing plane **********************************
+            
+        }
+        x = TwoDimPoints.PointsArray[Connections.get(CameraFacingPolygons).get(Connections.get(CameraFacingPolygons).size()-1)-EnumerationStartingPoint].Elements[0][0];//These Enumeration amounts are due to
+        y = TwoDimPoints.PointsArray[Connections.get(CameraFacingPolygons).get(Connections.get(CameraFacingPolygons).size()-1)-EnumerationStartingPoint].Elements[1][0];//the .obj which starts point enumeration
+        xTwo = TwoDimPoints.PointsArray[Connections.get(CameraFacingPolygons).get(0)-EnumerationStartingPoint].Elements[0][0];//at 1 instead of zero.
+        yTwo = TwoDimPoints.PointsArray[Connections.get(CameraFacingPolygons).get(0)-EnumerationStartingPoint].Elements[1][0];
+        XMin = Math.min(x, xTwo);
+        XMax = Math.max(x, xTwo);
+        YMin = Math.min(y, yTwo);
+        YMax = Math.max(y, yTwo);
+            
+        xInViewingPlane = false;
+        yInViewingPlane = false;
+        xTwoInViewingPlane = false;
+        yTwoInViewingPlane = false;
+        AllInViewingPlane = true;
+           
+        dx = xTwo-x;
+        dy = yTwo-y;
+        Slope = dy/dx;
+        b = y-x*Slope;
+        DX = Math.min(Math.abs(.05*Math.pow(Slope, -1.0)),.5);
+        //********************* Are any of the points outside the viewing plane *******************
+        if(x > -ResolutionX/2.0 || x < ResolutionX/2.0)
+        {
+          xInViewingPlane = true;
+        }
+        if(xTwo > -ResolutionX/2.0 || x < ResolutionX/2.0)
+        {
+          xTwoInViewingPlane = true;
+        }
+        if(y > -ResolutionY/2.0 || y < ResolutionY/2.0)
+        {
+          yInViewingPlane = true;
+        }
+        if(yTwo > -ResolutionY/2.0 || yTwo < ResolutionY/2.0)
+        {
+          yTwoInViewingPlane = true;
+        }
+        if(xInViewingPlane == false || yInViewingPlane == false || xTwoInViewingPlane == false || yTwoInViewingPlane == false)
+        {
+          AllInViewingPlane = false;
+          //System.out.println("Should not make it here for now until handle points outside of viewing plane.");
+        }
+        //************************** Case 1: All points are in viewing plane *******************************
+        if(AllInViewingPlane == true)
+        {
+          for(Dx = XMin; Dx < XMax; Dx +=DX)
+          {
+            Dy = Slope*Dx+b;
+            //Dy = Dy+Slope*DX;
+            temp = ((int)(Math.abs(Dx)+Math.abs(Dy)))/(Math.abs(Dx)+Math.abs(Dy));
+            A = (int)(255*temp);
+            R = 60;
+            G = 182;
+            B = 255;
+                 
+            p = (A<<24) | (B<<16) | (G<<8) | R;
+            if(((int)(Dy+ResolutionY/2.0) > 0 && (int)(Dx+ResolutionX/2.0) > 0
+            && (int)(Dy+ResolutionY/2.0) < ResolutionY && (int)(Dx+ResolutionX/2.0) < ResolutionX))// && Dy > YMin && Dy < YMax )
+            {
+               img.setRGB((int)(Dx+ResolutionX/2.0), (int)(Dy+ResolutionY/2.0), p);
+            }
+           }
+        }
+            //************************* Case 2: Points outside viewing plane **********************************
+      }
+      return img;
+    }
+     
+      public BufferedImage DrawProjectionConnectionsReducedOverHeadOpaque(BufferedImage img, Matrix.Points TwoDimPoints, List<List<Integer>> Connections,
+    List<Integer> CrulledBackGroundList, double ResolutionX, double ResolutionY, int EnumerationStartingPoint)
+    {
+      int debugWillUseThisInstead = CrulledBackGroundList.size();
+     // System.out.println(CrulledBackGroundList.size());
+      int debug = Connections.size();
+      double LineThinkness = .05;//5e-100;
+      double x, y, xTwo, yTwo;
+      boolean xInViewingPlane, yInViewingPlane, xTwoInViewingPlane, yTwoInViewingPlane, AllInViewingPlane;
+      double XMin;
+      double XMax;
+      double YMin;
+      double YMax;
+      double temp;
+      double Slope;
+      double dx;
+      double dy;
+      double Dx;
+      double Dy;
+      double DX;
+      double DY;
+      double b;
+      int X, Y;
+      
+      int p;
+      int A;
+      int R;
+      int G;
+      int B;
+      
+      //****** temporary should compute increment from resolution ********
+      //DX = .05;
+      for(int i = 0; i < ResolutionX; i++)
+      {
+        for(int j = 0; j < ResolutionY; j++)
+        {
+          p = img.getRGB( i, j);
+          if(p == 0)
+          {
+            A = 255;
+            R = 84;
+            G = 74;
+            B = 74;
+            
+            p = (A<<24) | (B<<16) | (G<<8) | R;
+            img.setRGB(i, j, p);
+          }
+        }
+      }
+      System.out.println(debugWillUseThisInstead);
+      for(int i = 0; i < debugWillUseThisInstead; i++)
+      {
+        int CameraFacingPolygons = CrulledBackGroundList.get(i);
+        for(int j = 0; j < Connections.get(CameraFacingPolygons).size()-1; j++)// I beleive this -1 is because the last line wraps back to the first
+        {                                                                      // and so the last connection must be drawn differently.
+            x = TwoDimPoints.PointsArray[Connections.get(CameraFacingPolygons).get(j)-EnumerationStartingPoint].Elements[0][0];//These Enumeration amounts are due to
+            y = TwoDimPoints.PointsArray[Connections.get(CameraFacingPolygons).get(j)-EnumerationStartingPoint].Elements[1][0];//the .obj which starts point enumeration
+            xTwo = TwoDimPoints.PointsArray[Connections.get(CameraFacingPolygons).get(j+1)-EnumerationStartingPoint].Elements[0][0];//at 1 instead of zero.
+            yTwo = TwoDimPoints.PointsArray[Connections.get(CameraFacingPolygons).get(j+1)-EnumerationStartingPoint].Elements[1][0];
+            //System.out.println("i value is "+i+" out of "+debug+", j value is "+j);
+            XMin = Math.min(x, xTwo);
+            XMax = Math.max(x, xTwo);
+            YMin = Math.min(y, yTwo);
+            YMax = Math.max(y, yTwo);
+            
+            xInViewingPlane = false;
+            yInViewingPlane = false;
+            xTwoInViewingPlane = false;
+            yTwoInViewingPlane = false;
+            AllInViewingPlane = true;
+            
+            dx = xTwo-x;
+            dy = yTwo-y;
+            Slope = dy/dx;
+            b = y-x*Slope;
+            DX = Math.min(Math.abs(.05*Math.pow(Slope, -1.0)),.5);
+            //********************* Are any of the points outside the viewing plane *******************
+            if(x > -ResolutionX/2.0 || x < ResolutionX/2.0)
+            {
+              xInViewingPlane = true;
+            }
+            if(xTwo > -ResolutionX/2.0 || x < ResolutionX/2.0)
+            {
+              xTwoInViewingPlane = true;
+            }
+            if(y > -ResolutionY/2.0 || y < ResolutionY/2.0)
+            {
+              yInViewingPlane = true;
+            }
+            if(yTwo > -ResolutionY/2.0 || yTwo < ResolutionY/2.0)
+            {
+              yTwoInViewingPlane = true;
+            }
+            if(xInViewingPlane == false || yInViewingPlane == false || xTwoInViewingPlane == false || yTwoInViewingPlane == false)
+            {
+              AllInViewingPlane = false;
+              //System.out.println("Should not make it here for now until handle points outside of viewing plane.");
+            }
+            //************************** Case 1: All points are in viewing plane *******************************
+            if(AllInViewingPlane == true)
+            {
+              for(Dx = XMin; Dx < XMax; Dx +=DX)
+              {
+                Dy = Slope*Dx+b;
+                //Dy = Dy+Slope*DX;
+                temp = ((int)(Math.abs(Dx)+Math.abs(Dy)))/(Math.abs(Dx)+Math.abs(Dy));
+                A = (int)(255*temp);
+                R = 60;
+                G = 182;
+                B = 255;
+                  
+                p = (A<<24) | (B<<16) | (G<<8) | R;
+                if(((int)(Dy+ResolutionY/2.0) > 0 && (int)(Dx+ResolutionX/2.0) > 0
+                && (int)(Dy+ResolutionY/2.0) < ResolutionY && (int)(Dx+ResolutionX/2.0) < ResolutionX))// && Dy > YMin && Dy < YMax )
+                {
+                  img.setRGB((int)(Dx+ResolutionX/2.0), (int)(Dy+ResolutionY/2.0), p);
+                }
+              }
+            }
+            //************************* Case 2: Points outside viewing plane **********************************
+            
+        }
+        x = TwoDimPoints.PointsArray[Connections.get(CameraFacingPolygons).get(Connections.get(CameraFacingPolygons).size()-1)-EnumerationStartingPoint].Elements[0][0];//These Enumeration amounts are due to
+        y = TwoDimPoints.PointsArray[Connections.get(CameraFacingPolygons).get(Connections.get(CameraFacingPolygons).size()-1)-EnumerationStartingPoint].Elements[1][0];//the .obj which starts point enumeration
+        xTwo = TwoDimPoints.PointsArray[Connections.get(CameraFacingPolygons).get(0)-EnumerationStartingPoint].Elements[0][0];//at 1 instead of zero.
+        yTwo = TwoDimPoints.PointsArray[Connections.get(CameraFacingPolygons).get(0)-EnumerationStartingPoint].Elements[1][0];
+        XMin = Math.min(x, xTwo);
+        XMax = Math.max(x, xTwo);
+        YMin = Math.min(y, yTwo);
+        YMax = Math.max(y, yTwo);
+            
+        xInViewingPlane = false;
+        yInViewingPlane = false;
+        xTwoInViewingPlane = false;
+        yTwoInViewingPlane = false;
+        AllInViewingPlane = true;
+           
+        dx = xTwo-x;
+        dy = yTwo-y;
+        Slope = dy/dx;
+        b = y-x*Slope;
+        DX = Math.min(Math.abs(.05*Math.pow(Slope, -1.0)),.5);
+        //********************* Are any of the points outside the viewing plane *******************
+        if(x > -ResolutionX/2.0 || x < ResolutionX/2.0)
+        {
+          xInViewingPlane = true;
+        }
+        if(xTwo > -ResolutionX/2.0 || x < ResolutionX/2.0)
+        {
+          xTwoInViewingPlane = true;
+        }
+        if(y > -ResolutionY/2.0 || y < ResolutionY/2.0)
+        {
+          yInViewingPlane = true;
+        }
+        if(yTwo > -ResolutionY/2.0 || yTwo < ResolutionY/2.0)
+        {
+          yTwoInViewingPlane = true;
+        }
+        if(xInViewingPlane == false || yInViewingPlane == false || xTwoInViewingPlane == false || yTwoInViewingPlane == false)
+        {
+          AllInViewingPlane = false;
+          //System.out.println("Should not make it here for now until handle points outside of viewing plane.");
+        }
+        //************************** Case 1: All points are in viewing plane *******************************
+        if(AllInViewingPlane == true)
+        {
+          for(Dx = XMin; Dx < XMax; Dx +=DX)
+          {
+            Dy = Slope*Dx+b;
+            //Dy = Dy+Slope*DX;
+            temp = ((int)(Math.abs(Dx)+Math.abs(Dy)))/(Math.abs(Dx)+Math.abs(Dy));
+            A = (int)(255*temp);
+            R = 60;
+            G = 182;
+            B = 255;
+                 
+            p = (A<<24) | (B<<16) | (G<<8) | R;
+            if(((int)(Dy+ResolutionY/2.0) > 0 && (int)(Dx+ResolutionX/2.0) > 0
+            && (int)(Dy+ResolutionY/2.0) < ResolutionY && (int)(Dx+ResolutionX/2.0) < ResolutionX))// && Dy > YMin && Dy < YMax )
+            {
+               img.setRGB((int)(Dx+ResolutionX/2.0), (int)(Dy+ResolutionY/2.0), p);
+            }
+           }
+        }
+            //************************* Case 2: Points outside viewing plane **********************************
+      }
+      return img;
+    }
+    //********************************** Computes the normal vector for a plane *********************************
+    //********************************** give a series of points which define the plane *************************
+    //********************************** (Should port to another class as this isn't a **************************
+    //********************************** linear transformation) **************************************************
+    //***********************************************************************************************************
+    public Matrix PlaneComputeNormal(Matrix PointOne, Matrix PointTwo, Matrix PointThree)
+    {
+      Matrix NormalVector = new Matrix( 4, 1);
+      NormalVector.Elements[0][0] = (PointOne.Elements[1][0]-PointTwo.Elements[1][0])*(PointThree.Elements[2][0]-PointTwo.Elements[2][0])-(PointOne.Elements[2][0]-PointTwo.Elements[2][0])*(PointThree.Elements[1][0]-PointThree.Elements[1][0]);
+      NormalVector.Elements[1][0] = (PointOne.Elements[0][0]-PointTwo.Elements[0][0])*(PointThree.Elements[2][0]-PointTwo.Elements[2][0])-(PointOne.Elements[2][0]-PointTwo.Elements[2][0])*(PointThree.Elements[0][0]-PointThree.Elements[0][0]);
+      NormalVector.Elements[2][0] = (PointOne.Elements[0][0]-PointTwo.Elements[0][0])*(PointThree.Elements[1][0]-PointTwo.Elements[1][0])-(PointOne.Elements[1][0]-PointTwo.Elements[1][0])*(PointThree.Elements[0][0]-PointThree.Elements[0][0]);
+      NormalVector.Elements[3][0] = 1;
+      return NormalVector;
+    }
+    public double PlaneComputeNormalAndReturnZ(Matrix PointOne, Matrix PointTwo, Matrix PointThree)
+    {
+      
+      double UOne = PointOne.Elements[0][0] - PointTwo.Elements[0][0];
+      double UTwo = PointOne.Elements[1][0] - PointTwo.Elements[1][0];
+      double UThree = PointOne.Elements[2][0] - PointTwo.Elements[2][0];
+      
+      double VOne = PointOne.Elements[0][0] - PointThree.Elements[0][0];
+      double VTwo = PointOne.Elements[1][0] - PointThree.Elements[1][0];
+      double VThree = PointOne.Elements[2][0] - PointThree.Elements[2][0];
+      
+      return UOne*VTwo - UTwo*VOne;
+    }
+    //****************************************** NEEDS FIX (HI-PRI) **********************************************
+    //************************************************************************************************************
+    public BufferedImage DrawProjectionConnections(BufferedImage img, Matrix.Points TwoDimPoints, List<List<Integer>> Connections)
+    {
+      int debug = 10; //Connections.size();
+      double LineThinkness = 0.0005d;
+      double x, y, xTwo, yTwo;
+      double XMin;
+      double XMax;
+      double YMin;
+      double YMax;
+      double temp;
+      int X, Y;
+      
+      int p;
+      int A;
+      int R;
+      int G;
+      int B;
+      
+      for(int i = 0; i < debug; i++)
+      {
+        for(int j = 0; j < Connections.get(i).size()-1; j++)
+        {
+          x = TwoDimPoints.PointsArray[Connections.get(i).get(j)-1].Elements[0][0];
+          y = TwoDimPoints.PointsArray[Connections.get(i).get(j)-1].Elements[1][0];
+          xTwo = TwoDimPoints.PointsArray[Connections.get(i).get(j+1)-1].Elements[0][0];
+          yTwo = TwoDimPoints.PointsArray[Connections.get(i).get(j+1)-1].Elements[1][0];
+          XMin = Math.min(x, xTwo);
+          XMax = Math.max(x, xTwo);
+          YMin = Math.min(y, yTwo);
+          YMax = Math.max(y, yTwo);
+          System.out.println("i value is "+i+" out of "+debug+", j value is "+j);
+          
+            for(double k = -680; k < 679; k++)
+            {
+              for(double l = -384; l < 383; l++)
+              {
+                temp = ComputeDistancFromPointToLineDefinedByTwoPoints(k, l, x, y, xTwo, yTwo);
+                
+                if( LineThinkness > temp) 
+                {
+                  if(k >= XMin && k <= XMax && l >= YMin && l <= YMax  )
+                  {
+                    A = (int)(255*(1-(temp)));
+                    R = 60;
+                    G = 182;
+                    B = 255;
+                  
+                   p = (A<<24) | (B<<16) | (G<<8) | R;
+                   img.setRGB((int)k+680, (int)l+384, p);
+                  }
+                }
+                if( Math.abs(x-xTwo)<1 && Math.abs(k-x)<1)
+                  {
+                    if(k >= XMin && k <= XMax && l >= YMin && l <= YMax  )
+                    {
+                      A = (int)(255*(1-Math.abs(k-x)));
+                      R = 60;
+                      G = 182;
+                      B = 255;
+                  
+                     p = (A<<24) | (B<<16) | (G<<8) | R;
+                     img.setRGB((int)k+680, (int)l+384, p);
+                    }
+                }
+                if( Math.abs(y-yTwo)<1 && Math.abs(l-y)<1)
+                {
+                    if(k >= XMin && k <= XMax && l >= YMin && l <= YMax )
+                    {
+                      A = (int)(255*(1-Math.abs(l-y)));
+                      R = 60;
+                      G = 182;
+                      B = 255;
+                  
+                     p = (A<<24) | (B<<16) | (G<<8) | R;
+                     img.setRGB((int)k+680, (int)l+384, p);
+                    }
+                }
+                p = img.getRGB((int)k+680,(int)l+384);
+                if(p == 0)
+                {
+                  A = 255;
+                  R = 84;
+                  G = 74;
+                  B = 74;
+            
+                  p = (A<<24) | (B<<16) | (G<<8) | R;
+                  img.setRGB((int)k+680, (int)l+384, p);
+                }
+              }
+            }
+        }
+        x = TwoDimPoints.PointsArray[Connections.get(i).get(0)-1].Elements[0][0];
+          y = TwoDimPoints.PointsArray[Connections.get(i).get(0)-1].Elements[1][0];
+          xTwo = TwoDimPoints.PointsArray[Connections.get(i).get(Connections.get(i).size()-1)-1].Elements[0][0];
+          yTwo = TwoDimPoints.PointsArray[Connections.get(i).get(Connections.get(i).size()-1)-1].Elements[1][0]; 
+          XMin = Math.min(x, xTwo);
+          XMax = Math.max(x, xTwo);
+          YMin = Math.min(y, yTwo);
+          YMax = Math.max(y, yTwo);
+      
+          
+            for(double k = -680; k < 679; k++)
+            {
+              for(double l = -384; l < 383; l++)
+              {
+                temp = ComputeDistancFromPointToLineDefinedByTwoPoints(k, l, x, y, xTwo, yTwo);
+                
+                if( LineThinkness > temp) 
+                {
+                  if(k >= XMin && k <= XMax && l >= YMin && l <= YMax  )
+                  {
+                    A = (int)(255*(1-(temp)));
+                    R = 60;
+                    G = 182;
+                    B = 255;
+                  
+                   p = (A<<24) | (B<<16) | (G<<8) | R;
+                   img.setRGB((int)k+680, (int)l+384, p);
+                  }
+                }
+                if( Math.abs(x-xTwo)<1 && Math.abs(k-x)<1)
+                  {
+                    if(k >= XMin && k <= XMax && l >= YMin && l <= YMax  )
+                    {
+                      A = (int)(255*(1-Math.abs(k-x)));
+                      R = 60;
+                      G = 182;
+                      B = 255;
+                  
+                     p = (A<<24) | (B<<16) | (G<<8) | R;
+                     img.setRGB((int)k+680, (int)l+384, p);
+                    }
+                }
+                if( Math.abs(y-yTwo)<1 && Math.abs(l-y)<1)
+                {
+                    if(k >= XMin && k <= XMax && l >= YMin && l <= YMax )
+                    {
+                      A = (int)(255*(1-Math.abs(l-y)));
+                      R = 60;
+                      G = 182;
+                      B = 255;
+                  
+                     p = (A<<24) | (B<<16) | (G<<8) | R;
+                     img.setRGB((int)k+680, (int)l+384, p);
+                    }
+                }
+                p = img.getRGB((int)k+680,(int)l+384);
+                if(p == 0)
+                {
+                  A = 255;
+                  R = 84;
+                  G = 74;
+                  B = 74;
+            
+                  p = (A<<24) | (B<<16) | (G<<8) | R;
+                  img.setRGB((int)k+680, (int)l+384, p);
+                }
+              }
+            }
+        }
+      return img;
+    }
+    
+  /**  public void DrawProjectionToBitMap(Matrix.Points TwoDimPoints, int n,)
+    {
+      BufferedImage img = new BufferedImage(1080,1080, BufferedImage.TYPE_INT_ARGB);
+      
+      img = DrawProjectionPoints(img, TwoDimPoints);
+      
+      
+      try
+      {
+        File f = new File ("C:\\Users\\marshal\\Desktop\\TestObj\\3DMesh"+n+".png");
+        ImageIO.write(DrawProjectionConnections(img, TwoDimPoints), "png", f);
+      }
+      catch(IOException e)
+      {
+        System.out.println(e);
+      }
+    }**/
+    //************************************* Creates a windows and draws to it in real time ******************************
+    //*******************************************************************************************************************
+     public JFrame DrawProjectionToBitMapVersionTwo(Matrix.Points TwoDimPoints, List<List<Integer>> Connections, List<Integer> CrulledBackGroundList, int n, int EnumerationStartingPoint)
+    {
+      JFrame window = new JFrame("Prototype");
+      window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+      
+      
+      BufferedImage img = new BufferedImage(4096,2160, BufferedImage.TYPE_INT_ARGB);
+      
+      img = DrawProjectionPoints(img, TwoDimPoints);
+      DisplayPackage.Display Screen = new DisplayPackage.Display();
+      window.add(Screen);
+      window.pack();
+      Screen.image = DrawProjectionConnectionsReducedOverHead(img, TwoDimPoints, Connections, CrulledBackGroundList, 4096, 2160, EnumerationStartingPoint);
+      window.setVisible(true);
+      return window;
+      /**try
+      {
+        File f = new File ("C:\\Users\\marshalcraft\\Desktop\\TestObj\\3DMesh"+n+".png");
+        ImageIO.write(DrawProjectionConnectionsReducedOverHead(img, TwoDimPoints, Connections, CrulledBackGroundList, 1360, 768, EnumerationStartingPoint), "png", f);
+      }
+      catch(IOException e)
+      {
+        System.out.println(e);
+      }**/
+    }
+    //**************************************re-draws jframe window*****************************
+    //*****************************************************************************************
+     public JFrame ReDrawWindow(Matrix.Points TwoDimPoints, List<List<Integer>> Connections, List<Integer> CrulledBackGroundList, JFrame window, int EnumerationStartingPoint)
+     {
+       BufferedImage img = new BufferedImage(1360,768, BufferedImage.TYPE_INT_ARGB);
+       img = DrawProjectionPoints(img, TwoDimPoints);
+       
+       DisplayPackage.Display Screen = new DisplayPackage.Display();
+       
+       Screen.image = DrawProjectionConnectionsReducedOverHead(img, TwoDimPoints, Connections, CrulledBackGroundList, 1360, 768, EnumerationStartingPoint);
+       window.getContentPane().removeAll();
+       window.getContentPane().invalidate();
+       window.add(Screen);
+       window.pack();
+       window.repaint();
+       window.getContentPane().revalidate();
+       window.setVisible(true);
+       return window;
+     }
+     public void DrawProjectionToBitMap(Matrix.Points TwoDimPoints, List<List<Integer>> Connections, int n, int EnumerationStartingPoint)
+    {
+      BufferedImage img = new BufferedImage(1360,768, BufferedImage.TYPE_INT_ARGB);
+      
+      img = DrawProjectionPoints(img, TwoDimPoints);
+      
+      
+      try
+      {
+        File f = new File ("C:\\Users\\marshalcraft\\Desktop\\TestObj\\3DMesh"+n+".png");
+        ImageIO.write(DrawProjectionConnectionsReducedOverHead(img, TwoDimPoints, Connections, 1360, 768, EnumerationStartingPoint), "png", f);
+      }
+      catch(IOException e)
+      {
+        System.out.println(e);
+      }
+    }
+     
+     public void DrawProjectionToBitMap(Matrix.Points TwoDimPoints, List<List<Integer>> Connections, List<Integer> CrulledBackGroundList, int n, int EnumerationStartingPoint)
+    {
+      BufferedImage img = new BufferedImage(1360,768, BufferedImage.TYPE_INT_ARGB);
+      
+      img = DrawProjectionPoints(img, TwoDimPoints);
+      
+      try
+      {
+        File f = new File ("C:\\Users\\marshalcraft\\Desktop\\TestObj\\3DMesh"+n+".png");
+        ImageIO.write(DrawProjectionConnectionsReducedOverHead(img, TwoDimPoints, Connections, CrulledBackGroundList, 1360, 768, EnumerationStartingPoint), "png", f);
+      }
+      catch(IOException e)
+      {
+        System.out.println(e);
+      }
+    }
+    
+    public void DrawProjectionToBitMapOpaque(Matrix.Points TwoDimPoints, List<List<Integer>> Connections, List<Integer> CrulledBackGroundList, int n, int EnumerationStartingPoint)
+    {
+      BufferedImage img = new BufferedImage(1360,768, BufferedImage.TYPE_INT_ARGB);
+      
+      img = DrawProjectionPoints(img, TwoDimPoints);
+      
+      try
+      {
+        File f = new File ("C:\\Users\\marshalcraft\\Desktop\\TestObj\\3DMesh"+n+".png");
+        ImageIO.write(DrawProjectionConnectionsReducedOverHeadOpaque(img, TwoDimPoints, Connections, CrulledBackGroundList, 1360, 768, EnumerationStartingPoint), "png", f);
+      }
+      catch(IOException e)
+      {
+        System.out.println(e);
+      }
+    }
+    /**public ByteArray DrawVideoframes()
+    {
+      
+    }**/
+   
+}

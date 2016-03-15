@@ -1,0 +1,15 @@
+import java.JFrame;
+import java.JPanel;
+import java.awt.*;
+
+class Display extends JPanel
+{
+  pubilc Dimension getPreferredSize()
+  {
+    return new Dimension(1360, 768);
+  }
+  public void paintComponent(Graphics g)
+  {
+    
+  }
+}

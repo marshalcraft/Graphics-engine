@@ -1,0 +1,728 @@
+import java.io.IOException;
+import java.io.FileReader;
+import java.io.File;
+import java.io.BufferedReader;
+import java.util.Scanner;
+import LinearAlgebraPackage.LinearAlgebra.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import javax.swing.*;
+import DisplayPackage.Display.*;
+
+public class OBJCodec
+{
+  LinearAlgebraPackage.LinearAlgebra.Matrix.Points wtf; 
+  //************* Finds String Size **************
+  //**********************************************
+   public static int ObjStringSize(String FilePath)
+   {
+     int ObjStringCounter = 0;
+     try
+     {
+       BufferedReader buffer = new BufferedReader(new FileReader(FilePath));
+       String s = null;
+       while((s = buffer.readLine()) != null)
+       {
+         ObjStringCounter++;
+       }
+       buffer.close();
+       return ObjStringCounter;
+     }
+       catch(IOException e)
+       {
+         System.out.println(e);
+       }
+       return 0;
+   }
+   //***************Gets the String as an array ********
+   //***************************************************
+   public static String[] ObjStringArray(String FilePath)
+   {
+     String[] ObjStringArrayData = new String[ObjStringSize(FilePath)+1];
+     int ObjStringIndex = 0;
+     try
+     {
+       BufferedReader buffer = new BufferedReader(new FileReader(FilePath));
+       while(( ObjStringArrayData[ObjStringIndex] = buffer.readLine()) != null)
+       {
+         ObjStringIndex++;
+         if(ObjStringIndex == ObjStringArrayData.length )
+         {
+           System.out.println("over ran the computed size");
+         }
+       }
+       buffer.close();
+       return ObjStringArrayData;
+     }
+     catch(IOException e)
+     {
+       System.out.println(e);
+     }
+     return null;
+   }
+  //**************** gets the char size ************ 
+  //************************************************
+  public static int ObjCharArraySize(String FilePath)
+  {
+     int ObjCharCounter = 0;
+     try
+     {
+       BufferedReader buffer = new BufferedReader(new FileReader(FilePath));
+       int c = 0;
+       while((c = buffer.read()) != -1)
+       {
+         ObjCharCounter++;
+       }
+       buffer.close();
+       return ObjCharCounter;
+     }
+       catch(IOException e)
+       {
+         System.out.println(e);
+       }
+       return 0;
+   }
+  //**************** gets the char array ***********
+  //************************************************
+  public static char[] ObjCharArray(String FilePath)
+  {
+     int[] ObjCharArrayData = new int[ObjCharArraySize(FilePath)+1];
+     char[] ObjCharArrayFromInt = new char[ObjCharArraySize(FilePath)+1];
+     int ObjCharIndex = 0;
+     try
+     {
+       BufferedReader buffer = new BufferedReader(new FileReader(FilePath));
+       while(( ObjCharArrayData[ObjCharIndex] = buffer.read()) != -1)
+       {
+         ObjCharArrayFromInt[ObjCharIndex] = (char)ObjCharArrayData[ObjCharIndex];
+         ObjCharIndex++;
+         if(ObjCharIndex == ObjCharArrayData.length )
+         {
+           System.out.println("over ran the computed size");
+         }
+       }
+       buffer.close();
+       return ObjCharArrayFromInt;
+     }
+     catch(IOException e)
+     {
+       System.out.println(e);
+     }
+     return null;
+   }
+  //****** Counts the vertex or number of v's *****
+  //***********************************************
+  public static int ObjVertexCounter(char[] ObjData)
+  {
+    int OutputNumberOfVertex = 0;
+    for(int x = 0; x < ObjData.length-1; x++)
+    {
+      if(ObjData[x] == 'v' && ObjData[x+1] == ' ')
+      {
+        OutputNumberOfVertex++;
+      }
+    }
+    return OutputNumberOfVertex;
+  }
+  //********* Parse the .obj file to get a single coordinate **********
+  //*******************************************************************
+  public static double ParseObjVertexCoordinate(char[] ObjData, int VIndex)
+  {
+    double Coordinate = 0;
+    int Tempdex = 0;
+    int DecimalPoint = 0;
+    boolean LineDelimited = false;
+    boolean FoundDecimal = false;
+    List<Character> DigitHolder = new ArrayList<Character>();
+    while(LineDelimited == false)
+    {
+      DigitHolder.add( ObjData[VIndex]);
+      if(ObjData[VIndex] == '.' )
+      {
+        DecimalPoint = Tempdex;
+        FoundDecimal = true;
+      }
+      Tempdex++;
+      VIndex++;
+      
+     // System.out.println(VIndex);
+      if((Character.isDigit(ObjData[VIndex]) == false && ObjData[VIndex] != 'e' && ObjData[VIndex] != '-' && ObjData[VIndex] != '.') ||  (ObjData[VIndex] == '.' && FoundDecimal == true)) 
+      {
+        LineDelimited = true;
+      }
+      if(ObjData[VIndex+1] == '.' && ObjData[VIndex+2] == '.') //DELETE; DEBUG ADDED 12/20/2015 2:03 AM
+      {
+        LineDelimited =true;
+      }
+    }
+
+    
+   //******** turn char list to double ******
+   StringBuilder CoordinateString = new StringBuilder();
+   for(int x = 0; x < Tempdex ; x++)
+   {
+     CoordinateString.append(DigitHolder.get(x));
+   }
+   //System.out.println(CoordinateString);
+   String CoordinateResult = CoordinateString.toString();
+  /** for(int x = 0; x < CoordinateResult.length(); x++)
+   {
+     if(Character.isDigit(CoordinateResult.charAt(x))== false && CoordinateResult.charAt(x) != '-' && CoordinateResult.charAt(x)  != '.'&& CoordinateResult.charAt(x) != ' ')
+     {
+       System.out.println(CoordinateResult);
+     }
+   }**/
+  /** if(CoordinateResult.charAt(0) == ' ')//REMOVE THIS IF STATEMENT!!! DEBUG 12/20/2015 1:54 AM
+   {
+     char[] temp = new char[CoordinateResult.length()-1];
+     
+     for(int x = 1; x < CoordinateResult.length()-1; x++)
+     {
+       temp[x] = CoordinateResult.charAt(x);
+     }
+     CoordinateResult = new String(temp);
+     //System.out.println(CoordinateResult);
+   }
+   if(Character.isDigit(CoordinateResult.charAt(0)) == false && CoordinateResult.charAt(0) != '-')
+   {
+     System.out.println(CoordinateResult.charAt(1));
+   }**/
+   Coordinate = Double.parseDouble(CoordinateResult);
+   //System.out.println(Coordinate);
+   return Coordinate;
+  }
+  //************************ Parses for f data. ******************************
+  //**************************************************************************
+  public static int ParseObjConnections(char[] ObjData, int VIndex)
+  {
+    int Tempdex = 0;
+    double Coordinate = 0;
+    boolean PointDelimiter = false;
+    List<Character> DigitHolder = new ArrayList<Character>();
+    while(PointDelimiter == false)
+    {
+      DigitHolder.add(ObjData[VIndex]);
+      VIndex++;
+      Tempdex++;
+      if(Character.isDigit(ObjData[VIndex]) == false && ObjData[VIndex] != '-')
+      {
+        PointDelimiter = true;
+      }
+    }
+      //*************** turn char list to double **************
+      StringBuilder CoordinateString = new StringBuilder();
+      for(int x = 0; x < Tempdex; x++)
+      {
+        CoordinateString.append(DigitHolder.get(x));
+      }
+      String CoordinateResult = CoordinateString.toString();
+      Coordinate = Double.parseDouble(CoordinateResult);
+      return (int)Coordinate;
+  }
+  //********************** Second Version **********************
+  //************************************************************
+  public static double[] ParseObjConnectionsTwo(char[] ObjData, int VIndex)
+  {
+    int Tempdex = 0;
+    double[] Coordinate = new double[3];
+    boolean PointDelimiter = false;
+    List<Character> DigitHolder = new ArrayList<Character>();
+    while(PointDelimiter == false)
+    {
+      DigitHolder.add(ObjData[VIndex]);
+      VIndex++;
+      Tempdex++;
+      if(Character.isDigit(ObjData[VIndex]) == false )//&& ObjData[VIndex] != '-')
+      {
+        PointDelimiter = true;
+      }
+    }
+      //*************** turn char list to double **************
+      StringBuilder CoordinateString = new StringBuilder();
+      for(int x = 0; x < Tempdex; x++)
+      {
+        CoordinateString.append(DigitHolder.get(x));
+      }
+      String CoordinateResult = CoordinateString.toString();
+      //System.out.println(CoordinateResult);
+      Coordinate[0] = Double.parseDouble(CoordinateResult);
+      Coordinate[1] = Tempdex;
+      //System.out.println(ObjData[VIndex]+GetLengthToNextDigit+", "+ObjData[VIndex+1]+", "+ObjData[VIndex+2]);
+      if(Character.isDigit(ObjData[VIndex+1]) == false )
+      {
+        Coordinate[2] = 1;
+      }
+      while(ObjData[VIndex] != ' ' && VIndex < ObjData.length)
+      {
+        VIndex++;
+      }
+      if( Character.isDigit(ObjData[VIndex-1]) == false || Character.isDigit(ObjData[VIndex+1]) == false)//ObjData[VIndex-1] == 'f')
+      {
+        Coordinate[2] = 1;
+      }
+      return Coordinate;
+  }
+  //********** Determines how many verteces there are **********
+  //************************************************************
+  public static int ObjGetMeshComplexity(char[] ObjData, int ObjSize)
+  {
+    int Size = 0;
+    for(int x = 0; x < ObjSize-1; x++)
+    {
+      if(ObjData[x] == 'v' && ObjData[x+1] == ' ')
+      {
+        Size++;
+      }
+    }
+    return Size;
+  }
+  //*************** Find length to next coordinate *************
+  //************************************************************
+  public static int LengthToCoordinate(char[] ObjData, int Index)
+  {
+    int Counter = 0;
+    boolean FoundWhiteSpace = false;
+    boolean DecimalFound = false;
+    while(FoundWhiteSpace == false)
+    {
+      if(ObjData[Index+Counter+1] == ' ' || (ObjData[Index+Counter+1] == '.' && DecimalFound == true))
+      {
+        FoundWhiteSpace = true;
+      }
+      Counter++;
+    }
+    return Counter;
+  }
+  //******** Get's geometrical vertex and stores the as points *******
+  //******************************************************************
+  public static LinearAlgebraPackage.LinearAlgebra.Matrix.Points OrderedGoemetricalVertexAsPoints(char[] ObjData, int ObjSize, int MeshComplexitySize)
+  {
+    int VertexCount = 0;
+    ArrayList<Integer> VertexObjReference = new ArrayList<Integer>();
+    LinearAlgebraPackage.LinearAlgebra GeometryVertexLinearAlgebra = new LinearAlgebraPackage.LinearAlgebra();
+    LinearAlgebraPackage.LinearAlgebra.Matrix GeometryVertexMatrix = GeometryVertexLinearAlgebra.new Matrix(4,1); 
+    LinearAlgebraPackage.LinearAlgebra.Matrix.Points VertexRaw = GeometryVertexMatrix.new Points(MeshComplexitySize);
+    for(int x = 0; x < ObjSize-1; x++)
+    {
+      if(ObjData[x] == 'v' && ObjData[x+1] == ' ' && (Character.isDigit(ObjData[x+2]) == true  || (ObjData[x+2] == '-' && Character.isDigit(ObjData[x+3]) == true)))
+      {
+        int DistanceSecondCoordinate = x+2+LengthToCoordinate(ObjData, x+2);
+        int DistanceThirdCoordinate = DistanceSecondCoordinate+LengthToCoordinate(ObjData, x+2)+1;
+       VertexRaw.PointsArray[VertexCount].Elements[0][0] = ParseObjVertexCoordinate(ObjData, x+2);
+       VertexRaw.PointsArray[VertexCount].Elements[1][0] = ParseObjVertexCoordinate(ObjData, DistanceSecondCoordinate);
+       VertexRaw.PointsArray[VertexCount].Elements[2][0] = ParseObjVertexCoordinate(ObjData, DistanceThirdCoordinate);
+       VertexRaw.PointsArray[VertexCount].Elements[3][0] = 1;
+        VertexCount++;
+        VertexObjReference.add(x);
+      }
+    }
+    
+    return VertexRaw;
+  }
+  //****** Gets integer value correspoding to how many faces there are in the file *******
+  //**************************************************************************************
+  public static int GetFacesFromObj(char[] ObjData)
+  {
+    int NumberOfFaces = 0;
+    for(int x = 0; x < ObjData.length; x++)
+    {
+      if(ObjData[x] == 'f' && ObjData[x+1] == ' ' && ( ObjData[x+2] == '0' || ObjData[x+2] == '1' || ObjData[x+2] ==
+      '2' || ObjData[x+2] == '3' || ObjData[x+2] == '4' || ObjData[x+2] == '5' || ObjData[x+2] == '6' || ObjData[x+2] ==
+      '7' || ObjData[x+2] == '8' || ObjData[x+2] == '9' ))
+      {
+        NumberOfFaces++;
+      }
+    }
+    return NumberOfFaces;
+  }
+  //********************** Gets the distance to next white space for connections ************************
+  //*****************************************************************************************************
+  public static int GetLengthToNextConnectedPoint(char[] ObjData, int VIndex)
+  {
+    int Counter = 0;
+    while((ObjData[VIndex] != ' ' || Character.isDigit(ObjData[VIndex+1]) != true) && ObjData.length > VIndex+1 ) //this logic seems a bit obfuscated...but seems to work.
+    {
+      VIndex++;
+      Counter++;
+    }
+    return Counter;
+  }
+  //*********************** Gets a list list of doubles for the faces of the mesh ***********************
+  //*****************************************************************************************************
+  public static List<List<Integer>> ObjConnections(char[] ObjData)
+  {
+    List<List<Integer>> Connections = new ArrayList<List<Integer>>();
+    int ConnectionCounter = 0;
+    for(int x = 0; x < ObjData.length; x++)
+    {
+      if(ObjData[x] == 'f' && ObjData[x+1] == ' ' && (Character.isDigit(ObjData[x+2]) == true || ObjData[x+2] == '-'))
+      {
+        if(ObjData[x+2] == '-')
+        {
+          Connections.add(new ArrayList<Integer>());
+          Connections.get(ConnectionCounter).add(-1*ParseObjConnections(ObjData, x+2));
+          Connections.get(ConnectionCounter).add(-1*ParseObjConnections(ObjData, x+2+GetLengthToNextConnectedPoint(ObjData, x+2)+1));
+          Connections.get(ConnectionCounter).add(-1*ParseObjConnections(ObjData, x+2+GetLengthToNextConnectedPoint(ObjData, x+2)+1+GetLengthToNextConnectedPoint(ObjData, x+2+GetLengthToNextConnectedPoint(ObjData, x+2)+1)));
+          ConnectionCounter++;
+        }
+        else
+        {
+          Connections.add(new ArrayList<Integer>());
+          Connections.get(ConnectionCounter).add(ParseObjConnections(ObjData, x+2));
+          Connections.get(ConnectionCounter).add(ParseObjConnections(ObjData, x+2+GetLengthToNextConnectedPoint(ObjData, x+2)+1));
+          Connections.get(ConnectionCounter).add(ParseObjConnections(ObjData, x+2+GetLengthToNextConnectedPoint(ObjData, x+2)+1+GetLengthToNextConnectedPoint(ObjData, x+2+GetLengthToNextConnectedPoint(ObjData, x+2)+1)));
+          ConnectionCounter++;
+        }
+      } 
+    }
+    return Connections;
+  }
+  //***************************** Get's faces from mesh as above but supports n-gons where n greater then 3 ********************************
+  //****************************************************************************************************************************************
+  public static List<List<Integer>> ObjConnectionsSupportNGon(char[] ObjData)
+  {
+    
+    List<List<Integer>> Connections = new ArrayList<List<Integer>>();
+    int ConnectionCounter = 0;
+    int PlaceHolder = 0;
+    double[] ParserParallelMethod = new double[3];
+    for(int x = 0; x < ObjData.length; x++)
+    {
+      if(ObjData[x] == 'f' && ObjData[x+1] == ' ' && Character.isDigit(ObjData[x+2]) == true)
+      {
+        Connections.add(new ArrayList<Integer>());
+        boolean first = true;
+        int FWidth = 0;
+        //Count to the next f for later so we know when the face ends.
+        while(ObjData.length > x+FWidth+1 && (ObjData[x+FWidth+1] != 'f' /*&& FWidth < 200*/ ))
+        {
+          FWidth++;
+        }//System.out.println(FWidth);
+        while(ParserParallelMethod[2] == 0 && x+2 < ObjData.length-FWidth)
+        {
+          if(first == true)
+          {
+            ParserParallelMethod = ParseObjConnectionsTwo(ObjData, x+2);
+            if(ParserParallelMethod[0] == 0)
+            {
+              System.out.println("first");
+              System.out.println("************ 1we have face indexed at zero at "+x+2+"**************");
+            }
+            first = false;
+            PlaceHolder = x+2;
+            //FWidth += PlaceHolder;
+            //PlaceHolder += FWidth;
+          }
+          else
+          {
+            ParserParallelMethod = ParseObjConnectionsTwo(ObjData, PlaceHolder);
+            if(ParserParallelMethod[0] == 0)
+            {
+              System.out.println("************ 2we have face indexed at zero at "+PlaceHolder+"**************");
+            }
+          }
+          PlaceHolder += GetLengthToNextConnectedPoint(ObjData, PlaceHolder)+1;
+          Connections.get(ConnectionCounter).add((int)ParserParallelMethod[0]);
+          if(PlaceHolder > ObjData.length)
+          {
+            ParserParallelMethod[2] = 1;
+          }
+         //System.out.println(ParserParallelMethod[2]+","+ParserParallelMethod[0]+","+ FWidth);
+        }
+        first = true;
+        FWidth = 0;
+        PlaceHolder = 0;
+        ParserParallelMethod[2] = 0;
+        ConnectionCounter++;
+      } 
+    }
+    for(int y = 0; y < 100 /**Connections.size() replace with 100 for large mesh **/; y++)
+    {
+      System.out.println();
+      for(int z = 0; z < Connections.get(y).size(); z++)
+      {
+        System.out.print(Connections.get(y).get(z)+ ", ");
+      }
+    }
+    return Connections;
+  }
+  //********************************** Necessary to scale up the obj model or configure render *********************************************
+  //****************************************************************************************************************************************
+  public static LinearAlgebraPackage.LinearAlgebra.Matrix.Points ScaleObjModel(double Factor, LinearAlgebraPackage.LinearAlgebra.Matrix.Points ObjVertex)
+  {
+    for(int x = 0; x < ObjVertex.PointsLength; x++)
+    {
+      ObjVertex.PointsArray[x].Elements[0][0] = Factor * ObjVertex.PointsArray[x].Elements[0][0];
+      ObjVertex.PointsArray[x].Elements[1][0] = Factor * ObjVertex.PointsArray[x].Elements[1][0];
+      ObjVertex.PointsArray[x].Elements[2][0] = Factor * ObjVertex.PointsArray[x].Elements[2][0];
+    }
+    return ObjVertex;
+  }
+  public static void RenderTestCube()
+  {
+    //int ObjSize = ObjCharArraySize(ObjFile);
+    //char[] ObjCharData = ObjCharArray(ObjFile);
+    //int ObjVertexCount = ObjVertexCounter(ObjCharData);
+    //int Size = ObjGetMeshComplexity(ObjCharData, ObjSize);
+    int Multiplyer = 5000;
+    LinearAlgebraPackage.LinearAlgebra GeometryVertexLinearAlgebra = new LinearAlgebraPackage.LinearAlgebra();
+    LinearAlgebraPackage.LinearAlgebra.Matrix GeometryVertexMatrix = GeometryVertexLinearAlgebra.new Matrix(4,1); 
+    LinearAlgebraPackage.LinearAlgebra.Matrix.Points VertexRaw = GeometryVertexMatrix.new Points(8);
+   // VertexRaw = ScaleObjModel(1000, VertexRaw);
+    
+    VertexRaw.PointsArray[0].Elements[0][0] = Multiplyer*0;
+    VertexRaw.PointsArray[0].Elements[1][0] = Multiplyer*0;
+    VertexRaw.PointsArray[0].Elements[2][0] = Multiplyer*0;
+    VertexRaw.PointsArray[0].Elements[3][0] = 1;
+    
+    VertexRaw.PointsArray[1].Elements[0][0] = Multiplyer*1;
+    VertexRaw.PointsArray[1].Elements[1][0] = Multiplyer*0;
+    VertexRaw.PointsArray[1].Elements[2][0] = Multiplyer*0;
+    VertexRaw.PointsArray[1].Elements[3][0] = 1;
+    
+    VertexRaw.PointsArray[2].Elements[0][0] = Multiplyer*1;
+    VertexRaw.PointsArray[2].Elements[1][0] = Multiplyer*1;
+    VertexRaw.PointsArray[2].Elements[2][0] = Multiplyer*0;
+    VertexRaw.PointsArray[2].Elements[3][0] = 1;
+    
+    VertexRaw.PointsArray[3].Elements[0][0] = Multiplyer*0;
+    VertexRaw.PointsArray[3].Elements[1][0] = Multiplyer*1;
+    VertexRaw.PointsArray[3].Elements[2][0] = Multiplyer*0;
+    VertexRaw.PointsArray[3].Elements[3][0] = 1;
+    
+    VertexRaw.PointsArray[4].Elements[0][0] = Multiplyer*0;
+    VertexRaw.PointsArray[4].Elements[1][0] = Multiplyer*0;
+    VertexRaw.PointsArray[4].Elements[2][0] = Multiplyer*1;
+    VertexRaw.PointsArray[4].Elements[3][0] = 1;
+    
+    VertexRaw.PointsArray[5].Elements[0][0] = Multiplyer*1;
+    VertexRaw.PointsArray[5].Elements[1][0] = Multiplyer*0;
+    VertexRaw.PointsArray[5].Elements[2][0] = Multiplyer*1;
+    VertexRaw.PointsArray[5].Elements[3][0] = 1;
+    
+    VertexRaw.PointsArray[6].Elements[0][0] = Multiplyer*1;
+    VertexRaw.PointsArray[6].Elements[1][0] = Multiplyer*1;
+    VertexRaw.PointsArray[6].Elements[2][0] = Multiplyer*1;
+    VertexRaw.PointsArray[6].Elements[3][0] = 1;
+    
+    VertexRaw.PointsArray[7].Elements[0][0] = Multiplyer*0;
+    VertexRaw.PointsArray[7].Elements[1][0] = Multiplyer*1;
+    VertexRaw.PointsArray[7].Elements[2][0] = Multiplyer*1;
+    VertexRaw.PointsArray[7].Elements[3][0] = 1;
+   
+    List<List<Integer>> Connections = new ArrayList<List<Integer>>();
+    
+    Connections.add(new ArrayList<Integer>());
+    Connections.get(0).add(0);
+    Connections.get(0).add(1);
+    Connections.get(0).add(2);
+    Connections.get(0).add(3);
+    
+    Connections.add(new ArrayList<Integer>());
+    Connections.get(1).add(4);
+    Connections.get(1).add(7);
+    Connections.get(1).add(6);
+    Connections.get(1).add(5);
+    
+    Connections.add(new ArrayList<Integer>());
+    Connections.get(2).add(0);
+    Connections.get(2).add(4);
+    Connections.get(2).add(5);
+    Connections.get(2).add(1);
+    
+
+    
+    Connections.add(new ArrayList<Integer>());
+    Connections.get(3).add(1);
+    Connections.get(3).add(5);
+    Connections.get(3).add(6);
+    Connections.get(3).add(2);
+    
+    Connections.add(new ArrayList<Integer>());
+    Connections.get(4).add(2);
+    Connections.get(4).add(6);
+    Connections.get(4).add(7);
+    Connections.get(4).add(3);
+    
+    Connections.add(new ArrayList<Integer>());
+    Connections.get(5).add(3);
+    Connections.get(5).add(7);
+    Connections.get(5).add(4);
+    Connections.get(5).add(0);
+    
+    
+    //**************************** Create 4, 4 by 4 matrix and 1, 4 by 1 vector ***************************
+    LinearAlgebraPackage.LinearAlgebra.Matrix MatrixAlgebra = GeometryVertexLinearAlgebra.new Matrix(4,4);
+    LinearAlgebraPackage.LinearAlgebra.Matrix MatrixAlgebra2 = GeometryVertexLinearAlgebra.new Matrix(4,4);
+    LinearAlgebraPackage.LinearAlgebra.Matrix MatrixAlgebra3 = GeometryVertexLinearAlgebra.new Matrix(4,1);
+    LinearAlgebraPackage.LinearAlgebra.Matrix MatrixAlgebra4 = GeometryVertexLinearAlgebra.new Matrix(4,4);
+    
+    //********** Create 2 Points objects one for coordinate change and one for 2D Projection **************
+    LinearAlgebraPackage.LinearAlgebra.Matrix.Points ChangeCoordinate = MatrixAlgebra.new Points(8);
+    LinearAlgebraPackage.LinearAlgebra.Matrix.Points ProjectTwoDimension = MatrixAlgebra.new Points(8);
+    
+    ChangeCoordinate = GeometryVertexLinearAlgebra.CompositionRotateThenTranslate(VertexRaw, ((3.0/4.0)*Math.PI-.5), 0d, (-(3.0/4.0)*Math.PI+.5), 0d, 0d, -40000d);
+    List<Integer> CrulledBackGroundList = PreBackGroundCullerCalculatedNorms(ChangeCoordinate, Connections, 0);
+    GeometryVertexLinearAlgebra.Projection(ChangeCoordinate, ProjectTwoDimension, 1500d);
+    JFrame window = GeometryVertexLinearAlgebra.DrawProjectionToBitMapVersionTwo(ProjectTwoDimension, Connections, CrulledBackGroundList, 2, 1);//DrawProjectionToBitMap(ProjectTwoDimension, Connections, 6, 0);
+  }
+  //*************************** Cull's most of the backside using the dotproduct ***************************
+  //*************************** of the polygon normal and viewing plane normal (z-axis) ********************
+  //********************************************************************************************************
+  public static List<Integer> PreBackGroundCullerCalculatedNorms(LinearAlgebraPackage.LinearAlgebra.Matrix.Points FullMesh, List<List<Integer>> Polygons, int EnumerationStartingPoint)
+  {
+    List<Integer> FacesCamera = new ArrayList<Integer>();
+    LinearAlgebraPackage.LinearAlgebra GeometryVertexLinearAlgebra = new LinearAlgebraPackage.LinearAlgebra();
+    LinearAlgebraPackage.LinearAlgebra.Matrix ViewingPlaneNorm = GeometryVertexLinearAlgebra.new Matrix(1,4);
+    ViewingPlaneNorm.Elements[0][0] = 0;
+    ViewingPlaneNorm.Elements[0][1] = 0;
+    ViewingPlaneNorm.Elements[0][2] = 1;
+    ViewingPlaneNorm.Elements[0][3] = 1;
+    //EnumerationStartingPoint = 0; //debug
+    for(int x = 0; x < Polygons.size(); x++)
+    {
+      List<Integer> Points = new ArrayList<Integer>();
+      for(int y = 0; y < Polygons.get(x).size(); y++)
+      {
+        Points.add(Polygons.get(x).get(y)-EnumerationStartingPoint);//What is this EnumerationStartigPoint doing here exxactly?
+      }
+      //System.out.println(Points.get(0));
+      /**if(Points.size() == 0)
+      {
+        System.out.println("must have been a nested int with no actual values for index at "+ x+".");
+        System.out.println("Polygon has outer index of "+Polygons.size());
+        System.out.println("Polygon first couple of inner values are " +Polygons.get(x-1).get(0)+", "+Polygons.get(x-1).get(1)+".");
+        System.out.println("It seems there is an error at the boundary at the end of the file");
+        System.out.println("where the last face value is. For now I will just check for it here");
+        System.out.println("instead of fixing it ahead in the objcodec.");
+      }**/
+      if(Polygons.get(x).size() != 0)
+      {
+      double ZValue = GeometryVertexLinearAlgebra.PlaneComputeNormalAndReturnZ(FullMesh.PointsArray[Points.get(0)], 
+      FullMesh.PointsArray[Points.get(1)], FullMesh.PointsArray[Points.get(2)]);
+      //System.out.println(ZValue);
+      if(  ZValue >= 0d)
+      {
+        //System.out.println( "added face inside culler");
+        FacesCamera.add(x);
+      }
+      }
+    }
+    return FacesCamera;
+  }
+  public static List<Integer> GetOpaquePolygons(List<Integer> PreCulled)
+  {
+  // List<Integer> 
+    return PreCulled;
+  }
+  public static void RenderCar(double Scaling, double ViewingPlaneOffset, double Zeta, double Beta, double Gamma,
+  double XOffset, double YOffset, double ZOffset, int x)
+  {
+    
+    
+    String ObjFile = "C:\\Users\\marshalcraft\\Desktop\\knight\\Shelby7.obj"; //Scifi downtown city.obj"; //knight.obj";
+    int ObjSize = ObjCharArraySize(ObjFile);
+    char[] ObjCharData = ObjCharArray(ObjFile);
+    int ObjVertexCount = ObjVertexCounter(ObjCharData);
+    int Size = ObjGetMeshComplexity(ObjCharData, ObjSize);
+    int rotation = 0;
+    
+    LinearAlgebraPackage.LinearAlgebra GeometryVertexLinearAlgebra = new LinearAlgebraPackage.LinearAlgebra();
+    LinearAlgebraPackage.LinearAlgebra.Matrix GeometryVertexMatrix = GeometryVertexLinearAlgebra.new Matrix(4,1); 
+    LinearAlgebraPackage.LinearAlgebra.Matrix.Points VertexRaw = OrderedGoemetricalVertexAsPoints(ObjCharData, ObjSize, Size);
+    LinearAlgebraPackage.LinearAlgebra.Matrix.Points VertexRawTwo = OrderedGoemetricalVertexAsPoints(ObjCharData, ObjSize, Size);
+    VertexRaw = ScaleObjModel(Scaling, VertexRaw);
+    VertexRawTwo = VertexRaw;
+    
+    List<List<Integer>> Connections = ObjConnectionsSupportNGon(ObjCharData);
+    System.out.println("The model has "+Connections.size()+" faces.");
+    System.out.println("The last polygon has "+Connections.get(Connections.size()-1).size()+" edges.");
+    
+    for(int i = 0; i < Connections.size(); i++)
+    {
+      for(int j = 0; j < Connections.get(i).size(); j++)
+      {
+        if(Connections.get(i).get(j) == 0)
+        {
+          System.out.println("THERE IS A FACE INDEXED AT ZERO AT ("+i+", "+j+").");
+        }
+      }
+    }
+    
+    //**************************** Create 4, 4 by 4 matrix and 1, 4 by 1 vector ***************************
+    LinearAlgebraPackage.LinearAlgebra.Matrix MatrixAlgebra = GeometryVertexLinearAlgebra.new Matrix(4,4);
+    LinearAlgebraPackage.LinearAlgebra.Matrix MatrixAlgebra2 = GeometryVertexLinearAlgebra.new Matrix(4,4);
+    LinearAlgebraPackage.LinearAlgebra.Matrix MatrixAlgebra3 = GeometryVertexLinearAlgebra.new Matrix(4,1);
+    LinearAlgebraPackage.LinearAlgebra.Matrix MatrixAlgebra4 = GeometryVertexLinearAlgebra.new Matrix(4,4);
+    
+    //********** Create 2 Points objects one for coordinate change and one for 2D Projection **************
+    LinearAlgebraPackage.LinearAlgebra.Matrix.Points ChangeCoordinate = MatrixAlgebra.new Points(Size);
+    LinearAlgebraPackage.LinearAlgebra.Matrix.Points ProjectTwoDimension = MatrixAlgebra.new Points(Size);
+    
+      ChangeCoordinate = GeometryVertexLinearAlgebra.CompositionRotateThenTranslate(VertexRawTwo, Zeta, Beta, Gamma, XOffset, YOffset, ZOffset);
+      List<Integer> CrulledBackGroundList = PreBackGroundCullerCalculatedNorms(ChangeCoordinate, Connections, 1);
+      GeometryVertexLinearAlgebra.Projection(ChangeCoordinate, ProjectTwoDimension, ViewingPlaneOffset);
+      JFrame window = GeometryVertexLinearAlgebra.DrawProjectionToBitMapVersionTwo(ProjectTwoDimension, Connections, CrulledBackGroundList, x, 1);
+      System.out.println(VertexRaw.PointsArray[0].Elements[0][0]+"this is frist vertexraw");
+      for(int m = 0; m < 2000; m++)
+      {
+       //LinearAlgebraPackage.LinearAlgebra.Matrix.Points ProjectTwoDimension = MatrixAlgebra.new Points(Size);
+        //ChangeCoordinate = MatrixAlgebra.new Points(Size);
+        //System.out.println(VertexRaw.PointsArray[0].Elements[0][0]);
+        if(m%30 == 1){
+          System.out.println(m);
+        }
+        VertexRawTwo = VertexRaw;
+        ChangeCoordinate = GeometryVertexLinearAlgebra.CompositionRotateThenTranslate(VertexRawTwo, Zeta+m*.05, Beta, Gamma+m*.05, XOffset, YOffset, ZOffset);
+        CrulledBackGroundList = PreBackGroundCullerCalculatedNorms(ChangeCoordinate, Connections, 1);
+        GeometryVertexLinearAlgebra.Projection(ChangeCoordinate, ProjectTwoDimension, ViewingPlaneOffset);
+        window = GeometryVertexLinearAlgebra.ReDrawWindow(ProjectTwoDimension, Connections, CrulledBackGroundList, window, 1);//Matrix.Points TwoDimPoints, List<List<Integer>> Connections, List<Integer> CrulledBackGroundList, JFrame window, int EnumerationStartingPoint
+      }
+      //System.out.println("Frame "+x+":1800 Step:"+.45*(((double)1200)/(1800d)) );
+    
+    //wtf.txt settings scaleobjmodel = 5000; projection plane distance = 1500; camera poistion z offset = -40000 z euler angle = ((3.0/4.0)*Math.PI)-.5+Math.PI/2.0 x euler angle = (-(3.0/4.0)*Math.PI+.25)
+    //RenderTestSquare();
+  }
+  public static void RenderMilleniumFalcon()
+  {
+    
+    String ObjFile = "C:\\Users\\marshalcraft\\Desktop\\Avent\\bunny.obj";
+    int ObjSize = ObjCharArraySize(ObjFile);
+    char[] ObjCharData = ObjCharArray(ObjFile);
+    int ObjVertexCount = ObjVertexCounter(ObjCharData);
+    int Size = ObjGetMeshComplexity(ObjCharData, ObjSize);
+    int rotation = 0;
+    
+    LinearAlgebraPackage.LinearAlgebra GeometryVertexLinearAlgebra = new LinearAlgebraPackage.LinearAlgebra();
+    LinearAlgebraPackage.LinearAlgebra.Matrix GeometryVertexMatrix = GeometryVertexLinearAlgebra.new Matrix(4,1); 
+    LinearAlgebraPackage.LinearAlgebra.Matrix.Points VertexRaw = OrderedGoemetricalVertexAsPoints(ObjCharData, ObjSize, Size);
+    VertexRaw = ScaleObjModel(1, VertexRaw);
+    
+    List<List<Integer>> Connections = ObjConnections(ObjCharData);
+    //System.out.println(Connections.size());
+    LinearAlgebraPackage.LinearAlgebra.Matrix MatrixAlgebra = GeometryVertexLinearAlgebra.new Matrix(4,4);
+    
+    LinearAlgebraPackage.LinearAlgebra.Matrix.Points ChangeCoordinate = MatrixAlgebra.new Points(Size);
+    LinearAlgebraPackage.LinearAlgebra.Matrix.Points ProjectTwoDimension = MatrixAlgebra.new Points(Size);
+    
+    ChangeCoordinate = GeometryVertexLinearAlgebra.CompositionRotateThenTranslate(VertexRaw, ((3.0/4.0)*Math.PI)+.25, 0.0, (-(3.0/4.0)*Math.PI)+.25, -1000000, 10000, 100000);
+    List<Integer> CrulledBackGroundList = PreBackGroundCullerCalculatedNorms(ChangeCoordinate, Connections, 1);
+    GeometryVertexLinearAlgebra.Projection(ChangeCoordinate, ProjectTwoDimension, 1000);
+    GeometryVertexLinearAlgebra.DrawProjectionToBitMap(ProjectTwoDimension, Connections, CrulledBackGroundList, 5, 1);
+  }
+  //************* MAIN ****************
+  //***********************************
+  //***********************************
+  public static void main(String[] args)
+  {
+    //RenderTestCube();
+    double Beta =  0;//1.55;//-Math.PI/4.0;
+    double Gamma = 0;//Math.PI/4.0;
+    double ZDistance = 150;
+    RenderCar(2, 10000, Beta,0, Gamma, 0, 0, ZDistance, 1);//x);
+     // RenderMilleniumFalcon();
+      System.out.println("hi");
+  }
+}
